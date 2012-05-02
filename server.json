@@ -1,0 +1,35 @@
+{
+  "port": 80,
+  "dirIndex": ["index.html"],
+  "servers": {
+    "a.tbcdn.cn": {
+      "path": "/Users/eward/assets",
+      "hooks": {
+        ".css": ["proxy"], 
+        ".js": ["proxy"], 
+        ".png": ["proxy"], 
+        ".gif": ["proxy"], 
+        ".jpg": ["proxy"], 
+        ".ico": ["proxy"]
+      }
+    },
+    "market": {
+      "path": "/Users/eward/Sites/dev/"
+    }
+  },
+  "hooks": {
+    ".php" : ["php"],
+    ".css" : ["less"]
+  },
+  "MIME": {
+    ".js": "application/x-javascript",
+    ".css": "text/css",
+    ".txt": "text/plain",
+    ".png": "image/png",
+    ".gif": "image/gif",
+    ".jpg": "image/jpeg",
+    ".swf": "application/x-shockwave-flash",
+    ".html": "text/html",
+    ".ico": "image/x-icon"
+  }
+}
