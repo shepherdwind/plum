@@ -32,6 +32,7 @@ stdclass.extend(LessHook, stdclass, {
     files.forEach(function(file, i){
       if (file !== false){
         var filePath = basePath + file.replace('.css', '.less');
+        var condiction = path.existsSync(filePath);
         if (path.existsSync(filePath)){
           this._lessc(filePath, i);
         } else {

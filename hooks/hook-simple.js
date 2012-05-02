@@ -1,7 +1,3 @@
-/**
- * @fileoverview php hook实现 
- * @author hanwen<hanwen.sah@taobao.com>
- */
 'use strict';
 var stdclass = require('../lib/stdclass');
 var path = require('path');
@@ -31,20 +27,17 @@ stdclass.extend(Hook, stdclass, {
       if (e.now) this.parse();
     });
   },
+
   parse: function parse(){
 
     if (!this.get('initialized')) return;
 
     var files = this.get('files');
-    var basePath = this.get('path');
 
     files.forEach(function(file, i){
       if (file !== false) return this._add();
 
-      var filePath = basePath + file;
-      var condiction = !path.existsSync(filePath);
-
-      return condiction ? this._do(file, i): this._add();
+      return this._condiction() ? this._do(file, i): this._add();
 
     }, this);
 
@@ -52,6 +45,15 @@ stdclass.extend(Hook, stdclass, {
 
   _add: function(){
     this.set('len', this.get('len') + 1);
+  },
+
+  _condiction: function(file){
+    /**
+     * var basePath = this.get('path');
+     * var filePath = basePath + file;
+     * var condiction = !path.existsSync(filePath);
+     * return condiction;
+     */
   },
 
   _do: function _do(file, i){
