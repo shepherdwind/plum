@@ -13,6 +13,8 @@ the file server.json is an config file
 
 ##hooks
 
+[Document](https://github.com/shepherdwind/plum/blob/master/hooks/README.md)
+
 hooks is the plugin for server, config in the server.json, the when parser some
 kind of file, it would run the hooks first, then, you can do any thing you want
 to do. Such as
