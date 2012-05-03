@@ -92,8 +92,7 @@ stdclass.extend(Origin, stdclass, {
         return;
       }
 
-      if (!ext) this._listDir();
-      if (!this._is404() && ext) this.set('status', 'initialized');
+      ext ? this.set('status', 'initialized'): this._listDir();
     }
   },
 
@@ -123,6 +122,9 @@ stdclass.extend(Origin, stdclass, {
     hook.parse();
   },
 
+  /**
+   * 文件列表夹，显示所有文件
+   */
   _listDir: function listDir(){
     var file = this.get('files')[0];
     var basePath = this.get('path');
@@ -152,26 +154,6 @@ stdclass.extend(Origin, stdclass, {
     var time = this.get('time');
     time.push(Date.now());
     this.set('time', time);
-  },
-
-  _is404: function is404(){
-
-    var files = this.get('files');
-    var basePath = this.get('path');
-    var fileName = '';
-    var err = files.some(function(file){
-      if (file !== false){
-        fileName = basePath + file;
-        return !path.existsSync(fileName);
-      }
-    });
-
-    if (err){
-      this.fire('onerror', {'message': ERROR_TYPE[404], file: fileName, type: 404});
-      return true;
-    } 
-
-    return false;
   },
 
   _getFile: function getFile(file, i){
@@ -207,8 +189,13 @@ stdclass.extend(Origin, stdclass, {
     });
 
     steam.on('error', function(err){
-      console.log(err);
-      self.fire('onerror', {message: err, file: filePath, index: i, type: 500});
+      console.log('[Error ' + err.code + ']' + err.message);
+      var errObj = {message: err.message, file: filePath, index: i, type: 500};
+      if (err.errno == 34){
+        errObj.message = ERROR_TYPE[404];
+        errObj.type = 404;
+      }
+      self.fire('onerror', errObj);
     });
   },
 

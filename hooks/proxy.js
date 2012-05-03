@@ -44,17 +44,16 @@ stdclass.extend(Proxy, stdclass, {
     files.forEach(function(file, i){
       if (file !== false){
         var filePath = basePath + file;
-
-        if (!path.existsSync(filePath)){
-          this._loadRemote(file, i);
-        } else {
-          this.set('len', this.get('len') + 1);
-        }
+        path.exists(filePath, this._loadRemote.bind(this, file, i));
       } else {
-        this.set('len', this.get('len') + 1);
+        this._add();
       }
     }, this);
 
+  },
+
+  _add: function(){
+    this.set('len', this.get('len') + 1);
   },
 
   _getIp: function getIp(){
@@ -68,13 +67,12 @@ stdclass.extend(Proxy, stdclass, {
     });
   },
 
-  _loadRemote: function loadRemote(file, i){
+  _loadRemote: function loadRemote(file, i, exist){
+
+    //如果存在，则退出
+    if (exist) return this._add();
+
     var self = this;
-    function addLen(){
-      var len = self.get('len');
-      len++;
-      self.set('len', len);
-    }
     var ret = [];
 
     http.get({
@@ -86,19 +84,18 @@ stdclass.extend(Proxy, stdclass, {
       path: file
     }, function (res) {
 
-      res.on('data', function (data) {
+      res.on('data', function(data){
         ret.push(data);
       });
-      res.on('end', function () {
-        self.fire('dataLoad', {
-          data: ret,
-          index: i
-        });
-        addLen();
+
+      res.on('end', function(){
+        self.fire('dataLoad', {data: ret, index: i});
+        self._add();
       });
+
     }).on('error', function(e){
-      addLen();
-      console.log('[remote] not got ' + file);
+      self._add();
+      console.log('[remote] got failed ' + file);
     });
   }
 

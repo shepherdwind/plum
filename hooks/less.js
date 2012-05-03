@@ -28,23 +28,29 @@ stdclass.extend(LessHook, stdclass, {
 
     var files = this.get('files');
     var basePath = this.get('path');
+    var self = this;
 
     files.forEach(function(file, i){
-      if (file !== false){
-        var filePath = basePath + file.replace('.css', '.less');
-        var condiction = path.existsSync(filePath);
-        if (path.existsSync(filePath)){
-          this._lessc(filePath, i);
-        } else {
-          this.set('len', this.get('len') + 1);
-        }
+
+      if (file === false) {
+        this._add();
       } else {
-        this.set('len', this.get('len') + 1);
+
+        var filePath = basePath + file.replace('.css', '.less');
+        path.exists(filePath, this._lessc.bind(this, file, i));
+
       }
     }, this);
   },
 
-  _lessc: function lessc(file, i){
+  _add: function(){
+    this.set('len', this.get('len') + 1);
+  },
+
+  _lessc: function lessc(file, i, exist){
+
+    if (!exist) return this._add();
+
     var self = this;
     var files = this.get('files');
 
@@ -53,33 +59,24 @@ stdclass.extend(LessHook, stdclass, {
       filename: path.basename(file)
     });
 
-    function dealErr(err){
-      console.log(err);
-      addLen();
-      return false;
-    }
-    function addLen(){
-      var len = self.get('len');
-      len = len + 1;
-      self.set('len', len);
-    }
-
     fs.readFile(file, function readFile(err, css){
-      if (err) return dealErr(err);
+
+      if (err) return self._add();
 
       try {
+
         parser.parse(css.toString(), function lessc(err, tree){
           if (err) return dealErr(err);
-          self.fire('dataLoad', {
-            index: i,
-            data: [tree.toCSS()]
-          });
-          addLen();
+          self.fire('dataLoad', {index: i, data: [tree.toCSS()]});
+          self._add();
         });
+
       } catch(e){
+
         console.log(e.message);
         console.log('[Error] lessc error on file ' + file);
-        addLen();
+        self._add();
+
       }
     });
   }

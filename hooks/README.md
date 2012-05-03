@@ -14,7 +14,7 @@ hook标准实现，简单说，就是，判断哪些文件(文件自动提供)�
 的操作，操作结束后，发布一个执行成功的事件，事件中把操作获得的数据返回。标准实现
 在hook.js(hook-simple.js是无注释版本)中，直接修改相应的部分即可。
 
-通常情况下，直接实现`_condiction`和`_do`方法就可以了。初始化需要执行的操作，写在
+通常情况下，直接实现`parse`和`_do`方法就可以了。初始化需要执行的操作，写在
 `_init`中调用。
 
 - 初始化方法，如果初始化方法有异步操作，需要设置initialized为false，并且在异步操
@@ -26,8 +26,8 @@ hook标准实现，简单说，就是，判断哪些文件(文件自动提供)�
 hook中，判断依据是以相同文件名的less文件是否存在，如果存在，less 解析替代 css本
 身，如果less不存在，回滚到origin，加载css文件。
 
-    var filePath = basePath + file.replace('.css', '.less');
-    var condiction = path.existsSync(filePath);
+		var filePath = basePath + file.replace('.css', '.less');
+		path.exists(filePath, this._do.bind(this, file, i));
 
 - _do方法中，操作完一个文件后，*需要把计数器加1*
 		
@@ -58,7 +58,7 @@ server.json配置如下:
 
 ###说明
 
-访问url: http://a.tbcdn.cn/tmse/5038/assets/css/index.css，根据服务器规则，首先
+访问`url: http://a.tbcdn.cn/tmse/5038/assets/css/index.css` 根据服务器规则，首先
 执行servers下的hooks，proxy(代理规则)，如果本地不存在对应文件，则从服务器读取。
 如果本地有，退出proxy规则，进入第二个hook，第二个是系统全局的hooks，less规则，
 less执行规则是，对应文件后缀改为less的文件存在，如果less文件存在，则执行less解析

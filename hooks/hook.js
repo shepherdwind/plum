@@ -72,7 +72,10 @@ stdclass.extend(Hook, stdclass, {
        * 判断逻辑，自定义，表示文件在某种情况下执行解析，如果无需解析，则自动进
        * 入origin解析，或者下一个hook
        */
-      return this._condiction() ? this._do(file, i): this._add();
+      var filePath = basePath + file.replace('.css', '.less');
+      path.exists(filePath, this._do.bind(this, file, i));
+
+      return null;
 
     }, this);
 
@@ -84,26 +87,16 @@ stdclass.extend(Hook, stdclass, {
   },
 
   /**
-   * 确定某个文件是否需要执行操作
-   * @param file {string} 文件名
-   * @return {bool}
-   */
-  _condiction: function(file){
-    /**
-     * var basePath = this.get('path');
-     * var filePath = basePath + file;
-     * var condiction = !path.existsSync(filePath);
-     * return condiction;
-     */
-  },
-
-
-  /**
    * 操作单个文件逻辑自行实现，需要注意的事，成功以后请发布一个事件，事件规范
    * this.fire('dataLoad', {data: [], index: i}); data为数组，数组由string或者
    * buffer构成, index为函数传递的参数i
+   * @param file {string} 文件路径
+   * @param i {number} 文件id
+   * @param exist {bool} 表示文件是否存在，path.exists 回调参数
    */
-  _do: function _do(file, i){
+  _do: function _do(file, i, exist){
+    if (exist) return this._add();
+    //you code
   }
 
 });

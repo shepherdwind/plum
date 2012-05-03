@@ -35,10 +35,11 @@ stdclass.extend(Hook, stdclass, {
     var files = this.get('files');
 
     files.forEach(function(file, i){
-      if (file !== false) return this._add();
-
-      return this._condiction() ? this._do(file, i): this._add();
-
+      if (file === false) return this._add();
+      var basePath = this.get('path');
+      var filePath = basePath + file;
+      path.exists(filePath, this._do.bind(this, file, i));
+      return null;
     }, this);
 
   },
@@ -47,16 +48,8 @@ stdclass.extend(Hook, stdclass, {
     this.set('len', this.get('len') + 1);
   },
 
-  _condiction: function(file){
-    /**
-     * var basePath = this.get('path');
-     * var filePath = basePath + file;
-     * var condiction = !path.existsSync(filePath);
-     * return condiction;
-     */
-  },
-
-  _do: function _do(file, i){
+  _do: function _do(file, i, exist){
+    if (!exist) return;
   }
 
 });
