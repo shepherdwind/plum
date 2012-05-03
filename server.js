@@ -68,7 +68,8 @@ function init(){
  * 处理错误
  */
 function error(e, response){
-  console.log(e);
+  var file = e.file || '';
+  console.log('[Error ' + e.type + ']: ' + file);
   response.writeHead(e.type, {'Content-Type': MIME['.html']});
   response.write(e.message);
   response.end();

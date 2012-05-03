@@ -1,6 +1,6 @@
 #Plum
 
-A litte server environment by node, work for demo deveploer. Easy to expand, or
+A litte server environment by node, work for demo develop. Easy to expand, or
 add an plugin to it.
 
 ##Use
@@ -12,6 +12,8 @@ add an plugin to it.
 the file server.json is an config file
 
 ##hooks
+
+[Document](https://github.com/shepherdwind/plum/blob/master/hooks/README.md)
 
 hooks is the plugin for server, config in the server.json, the when parser some
 kind of file, it would run the hooks first, then, you can do any thing you want
