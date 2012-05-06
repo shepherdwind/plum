@@ -30,6 +30,8 @@
     ".jpg": "image/jpeg",
     ".swf": "application/x-shockwave-flash",
     ".html": "text/html",
-    ".ico": "image/x-icon"
+    ".ico": "image/x-icon",
+    ".php": "text/html",
+    ".htm": "text/html"
   }
 }

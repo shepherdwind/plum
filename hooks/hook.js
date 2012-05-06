@@ -88,8 +88,11 @@ stdclass.extend(Hook, stdclass, {
 
   /**
    * 操作单个文件逻辑自行实现，需要注意的事，成功以后请发布一个事件，事件规范
-   * this.fire('dataLoad', {data: [], index: i}); data为数组，数组由string或者
-   * buffer构成, index为函数传递的参数i
+   * this.fire('data', {data: [], index: i}); data由string或者 buffer构成, index
+   * 为函数传递的参数i。
+   * 解析结束后发布end事件，如果data的获取是一次性的，则可以通过end事件同时带上
+   * 数据，数据格式和data事件一致。
+   * this.fire('end', {data: '', index: i})
    * @param file {string} 文件路径
    * @param i {number} 文件id
    * @param exist {bool} 表示文件是否存在，path.exists 回调参数

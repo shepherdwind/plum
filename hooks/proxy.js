@@ -85,11 +85,11 @@ stdclass.extend(Proxy, stdclass, {
     }, function (res) {
 
       res.on('data', function(data){
-        ret.push(data);
+        self.fire('data', {data: data, index: i});
       });
 
       res.on('end', function(){
-        self.fire('dataLoad', {data: ret, index: i});
+        self.fire('end', {index: i});
         self._add();
       });
 

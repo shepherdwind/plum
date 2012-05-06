@@ -37,7 +37,7 @@ stdclass.extend(LessHook, stdclass, {
       } else {
 
         var filePath = basePath + file.replace('.css', '.less');
-        path.exists(filePath, this._lessc.bind(this, file, i));
+        path.exists(filePath, this._lessc.bind(this, filePath, i));
 
       }
     }, this);
@@ -66,8 +66,7 @@ stdclass.extend(LessHook, stdclass, {
       try {
 
         parser.parse(css.toString(), function lessc(err, tree){
-          if (err) return dealErr(err);
-          self.fire('dataLoad', {index: i, data: [tree.toCSS()]});
+          self.fire('end', {index: i, data: tree.toCSS()});
           self._add();
         });
 

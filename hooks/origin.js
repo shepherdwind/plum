@@ -5,7 +5,7 @@ var fs = require('fs');
 var ERROR_TYPE = {
   503: '<p>Error 503. Too much time,  much more than the max time of server allowed',
   415: "<p><strong>Error 415</strong><p>Sever do not support the file type: ",
-  404: "<p> <strong>404 Error!\n <p>The url you requre is not exist!",
+  404: "<p><strong>404 Error!\n <p>The url you requre is not exist!",
   500: "<p><strong>500 Server Error!"
 };
 
@@ -18,10 +18,15 @@ stdclass.extend(Origin, stdclass, {
     path: '',
     files: [],
     ext: '',
+    //等于文件数目
     len: 0,
+    //当前成功获取到的文件数
     now: 0,
-    //born | begin | initialized | finish
+    //当前可以推送到客户端的文件序号
+    step: 0,
+    //born | begin | initialized | end
     status: 'born',
+    //记录总执行时间
     time: [],
     hooks: []
   },
@@ -32,44 +37,65 @@ stdclass.extend(Origin, stdclass, {
     TIME_OUT: 10000
   },
 
+  /**
+   * 初始化入口
+   */
   _init: function init(){
+
+    /**
+     * 临时贮存数据
+     */
     this.data = [];
+    //log信息贮存，在结束后统一输出，以免和其他请求的混合在一起
     this.log = [];
     this._bind();
 
+    for (var i = 0; i < this.get('len'); i++) {
+      this.data[i] = [];
+    }
+
     var self = this;
-    var timer = setTimeout(function(){
-      self.fire('onerror', {message: ERROR_TYPE[503], type: 503});
+    this.timer = setTimeout(function timeOut(){
+      self.fire('err', {message: ERROR_TYPE[503], type: 503});
     }, this.get('TIME_OUT'));
 
     this._recodeTime();
-
-    this._clearTimeOut = function(){
-      clearTimeout(timer);
-    };
-
     this.log.push('[Origin begin]:' + this.get('len') + ' files');
 
   },
 
+  /**
+   * 事件发布与绑定
+   */
   _bind: function bind(){
     //所有文件都成功读取到
     this.on('change:now:' + this.get('len'), function(e){
-      this.set('status', 'finish');
+      this.set('status', 'end');
       var time = this.get('time');
       this.log.push('[Origin end] spend time: ' + (time[1] - time[0]) + 'ms');
 
-      this.fire('finish', {data: this.data});
+      this.fire('end');
     });
 
     //发生错误
-    this.on('onerror', function(){
-      this.set('status', 'finish');
+    this.on('err', function(){
+      this.set('status', 'end');
     });
 
-    this.on('change:status:finish', function(){
+    this.on('change:status:end', function(){
       this._recodeTime();
-      this._clearTimeOut();
+      clearTimeout(this.timer);
+    });
+
+    this.once('data', function(e){
+      clearTimeout(this.timer);
+    });
+
+    this.on('change:step', function(e){
+      var files = this.get('files');
+      if (files[e.now] === false){
+        this._pushData('', e.now, true);
+      }
     });
 
     //初始化完成，开始读取文件
@@ -79,6 +105,9 @@ stdclass.extend(Origin, stdclass, {
     });
   },
 
+  /**
+   * 启动服务器功能
+   */
   parse: function parse(){
     var ext = this.get('ext');
     var MIME = this.get('MIME');
@@ -88,12 +117,48 @@ stdclass.extend(Origin, stdclass, {
       this._loadHook(hooks[0]);
     } else {
       if (ext && !MIME[ext]){
-        this.fire('onerror', {'message': ERROR_TYPE[415] + ext, type: "415"});
+        this.fire('err', {'message': ERROR_TYPE[415] + ext, type: "415"});
         return;
       }
 
       ext ? this.set('status', 'initialized'): this._listDir();
     }
+  },
+
+  /**
+   * 数据获取统一处理接口，接受来自steam或者stdin数据
+   * @param data {string|buffer} 获取到的数据
+   * @param i {number} 数据对应的文件
+   * @param isEnd {bool} 是否为文件结束
+   */
+  _pushData: function pushData(data, i, isEnd){
+    var files = this.get('files');
+    var step = this.get('step');
+    var datas = this.data;
+    var ret = data ? [data] : [];
+    var self = this;
+    i = i || 0;
+
+    if (i === step){
+
+      //把已经加载好的补上
+      ret = datas[i];
+      ret.push(data);
+      datas[i] = [];
+      this.fire('data', {data: ret});
+
+      if (isEnd) this.set('step', step + 1);
+    }
+    else {
+      this.data[i].push(data);
+    }
+  },
+
+  _endData: function endData(data, i){
+    var files = this.get('files');
+    files[i] = false;
+    this._pushData(data, i, true);
+    this.set('now', this.get('now') + 1);
   },
 
   _loadHook: function loadHook(name){
@@ -105,12 +170,14 @@ stdclass.extend(Origin, stdclass, {
       files: files.slice()
     });
 
-    hook.on('dataLoad', function(e){
-      this.data[e.index] = e.data;
-      this.log.push('[Hook ' + name + '] Got file ' + files[e.index]);
-      files[e.index] = false;
+    hook.on('data', function(e){
+      this._pushData(e.data, e.index);
+    }, this);
 
-      this.set('now', this.get('now') + 1);
+    hook.on('end', function(e){
+      this.log.push('[Hook ' + name + '] Got file ' + files[e.index] + 
+        '('+ e.index +'). spend time:' + this._getTime());
+      this._endData(e.data, e.index);
     }, this);
 
     hook.on('change:len:' + len, function(){
@@ -134,7 +201,7 @@ stdclass.extend(Origin, stdclass, {
 
     fs.readdir(dir, function readdir(err, files){
       if (err){
-        self.fire('onerror', {message: ERROR_TYPE[500], type: 500});
+        self.fire('err', {message: ERROR_TYPE[500], type: 500});
         return;
       }
 
@@ -144,9 +211,8 @@ stdclass.extend(Origin, stdclass, {
         if (!ext) name = name + '/';
         html += '<li><a href="' + name + '">' + name + "\n";
       });
-      self.data.push([html]);
       self.log.push('[Origin dir]: List dir ' + dir);
-      self.set('now', 1);
+      self._endData(html);
     });
   },
 
@@ -154,6 +220,16 @@ stdclass.extend(Origin, stdclass, {
     var time = this.get('time');
     time.push(Date.now());
     this.set('time', time);
+  },
+
+  _getTime: function getTime(){
+    var time = this.get('time');
+    var now = Date.now();
+    return now - time[0];
+  },
+
+  getSpendTime: function(){
+    return this._getTime();
   },
 
   _getFile: function getFile(file, i){
@@ -175,17 +251,15 @@ stdclass.extend(Origin, stdclass, {
     var ret = [];
 
     steam.on('data', function(data){
-      ret.push(data);
+      self._pushData(data, i);
+      //ret.push(data);
     });
 
     steam.on('end', function(){
       var now = self.get('now');
-      self.data[i] = ret;
-      self.log.push('[Origin file]: Get file ' + files[i]);
-
-      files[i] = false;
-      now = now + 1;
-      self.set('now', now);
+      self.log.push('[Origin file]: Get file ' + files[i] + '(' + i + 
+        '). Spend time: ' + self._getTime());
+      self._endData('', i);
     });
 
     steam.on('error', function(err){
@@ -195,13 +269,13 @@ stdclass.extend(Origin, stdclass, {
         errObj.message = ERROR_TYPE[404];
         errObj.type = 404;
       }
-      self.fire('onerror', errObj);
+      self.fire('err', errObj);
     });
   },
 
   isFinish: function isFinish(){
     var status = this.get('status');
-    return status === 'finish';
+    return status === 'end';
   }
 
 });

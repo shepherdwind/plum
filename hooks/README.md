@@ -33,9 +33,12 @@ hook中，判断依据是以相同文件名的less文件是否存在，如果存
 		
 		this._add();
 
-- _do方法成功后，需要发布一个事件，事件data是数组，数组由`string`或`buffer`组成
+- _do方法成功后，需要发布data事件和end事件，事件data属性组由`string`或`buffer`组成
 
-		this.fire('dataLoad', {data: [], index: i})
+    	//表示获取一部分数据，可以向客户端输出
+		this.fire('data', {data: '', index: i})
+    	//解析结束事件，如果data可以为空
+    	this.fire('end', {data: '', index: i})
 
 ##例子
 

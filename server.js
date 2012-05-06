@@ -57,8 +57,22 @@ function init(){
 
     var hook = new Origin(cfg);
     hook.set('MIME', MIME);
-    hook.once('finish', success, hook, res, cfg);
-    hook.once('onerror', error, hook, res, cfg);
+    hook.once('data', function(){
+      res.writeHead(200, {
+        'Content-Type': MIME[ext] || MIME['.html']
+      });
+    });
+    hook.on('data', success, hook, res, cfg);
+    hook.once('end', function(){
+      res.end();
+      //超过20ms的信息log出来
+      if (hook.getSpendTime() > 20){
+        hook.log.forEach(function(msg){
+          console.log(msg);
+        });
+      }
+    });
+    hook.once('err', error, hook, res, cfg);
     hook.parse();
 
   }).listen(config.port);
@@ -80,19 +94,9 @@ function error(e, response){
  */
 function success(e, response, cfg){
   var ext = cfg.ext;
-  response.writeHead(200, {'Content-Type': MIME[ext] || MIME['.html']});
-
-  this.log.forEach(function(msg){
-    console.log(msg);
+  e.data.forEach(function(buf){
+    if (buf) response.write(buf);
   });
-
-  e.data.forEach(function(content){
-    content.forEach(function(buf){
-      response.write(buf);
-    });
-  });
-
-  response.end();
 }
 
 function getHooks(ext, host){
