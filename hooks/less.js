@@ -66,7 +66,16 @@ stdclass.extend(LessHook, stdclass, {
       try {
 
         parser.parse(css.toString(), function lessc(err, tree){
-          self.fire('end', {index: i, data: tree.toCSS()});
+          var data;
+          try {
+            data = tree.toCSS();
+          } catch(e){
+            console.log(e.message);
+            console.log('[Error] lessc error on file ' + file);
+            self._add();
+          }
+
+          self.fire('end', {index: i, data: data});
           self._add();
         });
 
