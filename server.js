@@ -28,6 +28,13 @@ function init(){
     var files = parse(url);
     var ext = path.extname(files[0]);
     var hosts = config.servers;
+
+    //console.log(req.headers);
+    if (!hosts[host]){
+      console.log('[Error], ' + host + ' is not defined in the config.json');
+      return;
+    }
+
     var basePath = hosts ? (hosts[host]['path'] || __dirname) : __dirname;
 
     //处理路径问题，默认从dirIndex中读取，如果没有则显示list

@@ -18,7 +18,7 @@
     }
   },
   "hooks": {
-    ".php" : ["php"],
+    ".php" : ["php/tms", "php/cli"],
     ".css" : ["less"]
   },
   "MIME": {
