@@ -129,34 +129,41 @@ function tb_json_encode($value, $options = 0) {
 	return json_encode(tb_json_convert_encoding($value, "GBK", "UTF-8")); 
 } 
 
-function tb_json_decode($str, $assoc = false, $depth = 512) { 
+function tb_json_decode($str, $assoc = false, $depth = 512) 
+{ 
 	$str = iconv('gbk','utf-8',$str);
 	return tb_json_convert_encoding(json_decode($str, $assoc), "UTF-8", "GBK"); 
 } 
 
-function tb_json_convert_encoding($m, $from, $to) { 
-	switch(gettype($m)) { 
-	case 'integer': 
-	case 'boolean': 
-	case 'float': 
-	case 'double': 
-	case 'NULL': 
-	return $m; 
-	
-	case 'string': 
-	return mb_convert_encoding($m, $to, $from); 
-	case 'object': 
-	$vars = array_keys(get_object_vars($m)); 
-	foreach($vars as $key) { 
-		$m->$key = tb_json_convert_encoding($m->$key, $from ,$to); 
-	} 
-	return $m; 
-	case 'array': 
-	foreach($m as $k => $v) { 
-		$m[tb_json_convert_encoding($k, $from, $to)] = tb_json_convert_encoding($v, $from, $to); 
-	} 
-	return $m; 
-	default: 
-	} 
-	return $m; 
+function tb_json_convert_encoding($m, $from, $to) 
+{ 
+    switch(gettype($m)) { 
+    case 'integer': 
+    case 'boolean': 
+    case 'float': 
+    case 'double': 
+    case 'NULL': 
+        return $m; 
+
+    case 'string': 
+        return mb_convert_encoding($m, $to, $from); 
+
+    case 'object': 
+        $vars = array_keys(get_object_vars($m)); 
+        foreach($vars as $key) 
+        { 
+            $m->$key = tb_json_convert_encoding($m->$key, $from ,$to); 
+        } 
+        return $m; 
+
+    case 'array': 
+        foreach($m as $k => $v) 
+        { 
+            $m[tb_json_convert_encoding($k, $from, $to)] = tb_json_convert_encoding($v, $from, $to); 
+        } 
+        return $m; 
+    default: 
+    } 
+
+    return $m; 
 }
