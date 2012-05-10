@@ -22,7 +22,9 @@ stdclass.extend(Hook, stdclass, {
     initialized: true
   },
 
-  CONSIT: {},
+  CONSIT: {
+    request: {}
+  },
 
   _init: function init(){
     this._bind();
@@ -60,7 +62,14 @@ stdclass.extend(Hook, stdclass, {
   _do: function _do(file, i, exist){
     if (!exist || file.indexOf('.tms') < 0) return this._add();
 
-    var cmd = spawn('php', [TMS_PATH, file]);
+    var request = this.get('request');
+    var isBuild = request.url.indexOf('?build') > 0;
+
+    if (isBuild){
+      this.fire('set:header', {type: '.txt'});
+    }
+
+    var cmd = spawn('php', [TMS_PATH, file, +isBuild]);
     var ret = [];
     var err = [];
     var self = this;

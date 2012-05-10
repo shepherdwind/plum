@@ -59,14 +59,24 @@ function init(){
       hooks: hooks,
       time: []
     };
+    var contentType = MIME[ext] || MIME['.html'];
 
     res.setHeader("Server", "Node");
 
     var hook = new Origin(cfg);
     hook.set('MIME', MIME);
+    hook.set('request', req);
+
+    //修改头信息
+    hook.on('set:header', function(e){
+      if (e.type){
+        contentType = MIME[e.type] || contentType;
+      }
+    });
+
     hook.once('data', function(){
       res.writeHead(200, {
-        'Content-Type': MIME[ext] || MIME['.html']
+        'Content-Type': contentType
       });
     });
     hook.on('data', success, hook, res, cfg);

@@ -34,7 +34,8 @@ stdclass.extend(Origin, stdclass, {
   CONSIT: {
     MIME: {},
     //服务器超时10s
-    TIME_OUT: 10000
+    TIME_OUT: 10000,
+    request: {}
   },
 
   /**
@@ -169,6 +170,13 @@ stdclass.extend(Origin, stdclass, {
       path: this.get('path'), 
       files: files.slice()
     });
+
+    if (hook.CONSIT['request']){
+      hook.set('request', this.get('request'));
+    }
+    hook.on('set:header', function(e){
+      this.fire('set:header', e);
+    }, this);
 
     hook.on('data', function(e){
       this._pushData(e.data, e.index);
