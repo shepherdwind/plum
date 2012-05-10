@@ -7,7 +7,7 @@ $file = $_SERVER['argv'][1];
 $isBuild = $_SERVER['argv'][2];
 $json_file = str_replace('.php', '.json', $file);
 $jsonData = tb_json_decode(file_get_contents($json_file), true);
-ini_set('include_path', ini_get('include_path'). dirname($file));
+ini_set('include_path', ini_get('include_path') . ';'. dirname($file));
 
 repeatReplace($file);
 
