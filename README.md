@@ -7,6 +7,8 @@
   
     node server.js
 
+依赖php cli和node的less模块，请首先安装。
+
 ##config
 
 配置文件: `server.json`。配置方式和Apache基本一直，不过没有那么复杂。
@@ -66,10 +68,17 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
   和 server.json配置的path决定)，如果不存在，从cdn服务器获取数据。如果存在，则退
   出，origin处理自动。
 
-- *php*
+- *php/cli*
 
   通过php cli解析php文件，现在还不支持post和get请求，作为demo环境基本够用，执行
   效率和由php 自身性能决定，和转发者是node还是apache无关。
+
+- *php/tms*
+
+  模拟tms函数，生成demo。判断规则是：文件是php，并且含有.tms，tms规则支持tms文件
+  引用，不过要求，每次只引用一个文件(`<?php include 'a.tms.php';?>`)，而且文件名
+  中含有.tms。demo的数据根据请求的文件名，把后缀改为json，比如访问a.tms.php，demo
+  数据源为a.tms.json，运行时，每个函数通过name来定位数据。
 
 ##TODO
 

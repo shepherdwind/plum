@@ -18,7 +18,7 @@ stdclass.extend(Origin, stdclass, {
     path: '',
     files: [],
     ext: '',
-    //等于文件数目
+    //等于文件总数目
     len: 0,
     //当前成功获取到的文件数
     now: 0,
