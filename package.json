@@ -1,0 +1,11 @@
+{
+  "name"          : "plum",
+  "description"   : "Demo server environment by node",
+  "keywords"      : ["less", "server", "proxy", "tms"],
+  "author"        : "Eward Song<hanwen.sah@taobao.com>",
+  "contributors"  : [],
+  "version"       : "0.1.0",
+  "bin"           : { "plum": "./plum" },
+  "main"          : "./server",
+  "engines"       : { "node": ">=0.6.10" }
+}

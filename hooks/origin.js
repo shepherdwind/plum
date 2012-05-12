@@ -183,7 +183,7 @@ stdclass.extend(Origin, stdclass, {
     }, this);
 
     hook.on('end', function(e){
-      this.log.push('[Hook ' + name + '] Got file ' + files[e.index] + 
+      this.log.push('[Hook ' + name + '] Get file ' + files[e.index] + 
         '('+ e.index +'). spend time:' + this._getTime());
       this._endData(e.data, e.index);
     }, this);
