@@ -7,10 +7,10 @@ var Origin = require('./hooks/origin');
 var config;
 var MIME = {};
 
-/**
- * 入口，读取配置文件
- */
 function server(){
+  /**
+   * 入口，读取配置文件
+   */
   fs.readFile('server.json', 'utf-8', function(err, json){
     if (err) console.log(err);
     config = JSON.parse(json);
