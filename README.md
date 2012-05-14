@@ -5,7 +5,8 @@
 
 ##Use
   
-    node server.js
+      sudo npm install plum
+      sudo plum
 
 依赖php cli和node的less模块，请首先安装。
 
