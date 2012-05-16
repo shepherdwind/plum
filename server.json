@@ -10,6 +10,7 @@
         ".png": ["proxy"], 
         ".gif": ["proxy"], 
         ".jpg": ["proxy"], 
+        ".swf": ["proxy"],
         ".ico": ["proxy"]
       }
     },

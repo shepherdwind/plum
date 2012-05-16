@@ -15,7 +15,9 @@ stdclass.extend(LessHook, stdclass, {
     len: 0
   },
 
-  CONSIT: {},
+  CONSIT: {
+    request: {}
+  },
 
   _init: function init(){
     this._bind();
@@ -54,6 +56,13 @@ stdclass.extend(LessHook, stdclass, {
     var self = this;
     var files = this.get('files');
 
+    var request = this.get('request');
+    var referer = request.headers['referer'];
+    var isWriteFile = false;
+    if (referer && referer.indexOf('?less') > 0){
+      isWriteFile = true;
+    }
+
     var parser = new(less.Parser)({
       paths: [path.dirname(file)], 
       filename: path.basename(file)
@@ -69,14 +78,24 @@ stdclass.extend(LessHook, stdclass, {
           var data;
           try {
             data = tree.toCSS();
+
+            if (isWriteFile){
+              fs.writeFile(file.replace('.less', '.css'), data, function (err) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  console.log('[Less build] success ' + file);
+                }
+              });
+            }
+
           } catch(e){
             console.log(e.message);
             console.log('[Error] lessc error on file ' + file);
-            self._add();
           }
 
-          self.fire('end', {index: i, data: data});
           self._add();
+          self.fire('end', {index: i, data: data});
         });
 
       } catch(e){

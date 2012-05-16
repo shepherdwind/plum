@@ -42,7 +42,7 @@ function tms_include($file)
 
     foreach($strs as $key=> $val)
     {
-        $tmp = explode('<?php', $val);
+        $tmp = explode('<?', $val);
         $matched = FALSE;
 
         if(count($tmp) == 2)
@@ -64,7 +64,7 @@ function tms_include($file)
         {
             if (isset($tmp[1]))
             {
-                $ret .= $tmp[0] . '<?php' . $tmp[1] . '?>';
+                $ret .= $tmp[0] . '<?' . $tmp[1] . '?>';
             }
             else
             {
