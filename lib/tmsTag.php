@@ -16,7 +16,7 @@
 /** 定义tags常见常量 */
 define ( '_TMS_TEXT', "string");
 define ( '_TMS_LINK', "http://www.taobao.com");
-define ( '_TMS_IMAGE', "http://farm9.staticflickr.com/8002/7182011630_b5d2987cec_z.jpg");
+define ( '_TMS_IMAGE', "http://img.f2e.taobao.net/img.png_");
 /**
  * TMS 通用签
  * ！此函数是为其他函数调用，请勿在模板里面直接使用，否则TMS解析不了此函数哦
@@ -115,7 +115,7 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
                 break;
             case "img":
                 if (isset($mathImg[$index])){
-                    $key2 = "http://img.f2e.taobao.net/img.png_".$mathImg[$index][$key2].'.jpg';
+                    $key2 = _TMS_IMAGE .$mathImg[$index][$key2].'.jpg';
                 }
                 break;
             case "date":
@@ -199,12 +199,15 @@ function _tms_textLink ( $args='' ) {
  */
 function _tms_image ( $args='' ) {
 
+    $argsNew = tb_json_decode($args);
+    $size = preg_match('/\[([\dx]*)]/', $argsNew->title, $match);
+
     $attributes = array (
         /**
          * 通用key
          * 商品图片地址
          */
-        'img' => _TMS_IMAGE,
+        'img' => _TMS_IMAGE . $match[1] . '.jpg',
     );
 
     return _tms_common( $args ,$attributes );
@@ -228,12 +231,15 @@ function _tms_image ( $args='' ) {
  */
 function _tms_imageLink ( $args='' ) {
 
+    $argsNew = tb_json_decode($args);
+    $size = preg_match('/\[([\dx]*)]/', $argsNew->title, $match);
+
     $attributes = array (
         /**
          * 通用key
          * 商品图片地址
          */
-        'img' => _TMS_IMAGE,
+        'img' => _TMS_IMAGE . $match[1] . '.jpg',
     );
 
 
