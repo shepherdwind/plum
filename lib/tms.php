@@ -6,8 +6,9 @@
 $file = $_SERVER['argv'][1];
 $isBuild = $_SERVER['argv'][2];
 $json_file = str_replace('.php', '.json', $file);
-$jsonData = tb_json_decode(file_get_contents($json_file), true);
+$jsonData = tb_json_decode(@file_get_contents($json_file), true);
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname($file));
+include('tmsTag.php');
 
 repeatReplace($file);
 
@@ -76,63 +77,14 @@ function tms_include($file)
 }
 
 
-function _tms_common ( $args ) {
+function _tms_common ( $args, $attributes = '') {
     global $jsonData;
     $json = json_decode(iconv('gbk', 'utf-8', $args), true);
-    if (array_key_exists($json['name'], $jsonData)) {
+    if ($jsonData AND array_key_exists($json['name'], $jsonData)) {
         return $jsonData[$json['name']];
+    } else {
+        return tms_common($args , $attributes);
     }
-}
-
-function _tms_text ( $args='' ) {
-    return _tms_common( $args );
-}
-
-function _tms_textLink ( $args='' ) {
-    return _tms_common( $args );
-}
-
-function _tms_image ( $args='' ) {
-    return _tms_common( $args );
-}
-
-function _tms_imageLink ( $args='' ) {
-    return _tms_common( $args );
-}
-
-function _tms_custom ( $args='' ) {
-
-    $json = json_decode( iconv( 'gbk','utf-8',$args ) , true );
-    if(!array_key_exists('row',$json)||!array_key_exists('defaultRow',$json)) {
-        echo "！@#￥！ _tms_custom标签缺失row或defaultRow属性，上传到TMS会出错";
-        break;
-    }
-    return _tms_common ( $args );
-}
-
-
-function _tms_articleList ( $args='' ) {
-    return _tms_common ( $args , $attributes);
-}
-
-function _tms_subArea ( $args='' ) {
-    return;
-}
-
-function _tms_module_begin() {
-    return;
-}
-
-function _tms_module_end() {
-    return;
-}
-
-function _tms_repeat_begin( $arg='' ) {
-    return;
-}
-
-function _tms_repeat_end() {
-    return;
 }
 
 function tb_json_encode($value, $options = 0) { 
@@ -176,4 +128,21 @@ function tb_json_convert_encoding($m, $from, $to)
     } 
 
     return $m; 
+}
+
+/**
+ * 将字符串解析成数组并存储
+ * @param $args string|array
+ */
+function tms_parse_args( $args, $defaults = '' ) {
+    if ( is_object( $args ) )
+        $r = get_object_vars( $args );
+    elseif ( is_array( $args ) )
+        $r =& $args;
+    else
+        parse_str( $args, $r );
+
+    if ( is_array( $defaults ) )
+        return array_merge( $defaults, $r );
+    return $r;
 }
