@@ -131,6 +131,7 @@ Server.prototype = {
     var hook = new Origin(cfg);
 
     hook.set('MIME', MIME);
+    hook.set('bin', config.bin);
     hook.set('request', this.request);
 
     //修改头信息

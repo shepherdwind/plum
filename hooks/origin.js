@@ -35,6 +35,7 @@ stdclass.extend(Origin, stdclass, {
     MIME: {},
     //服务器超时10s
     TIME_OUT: 10000,
+    bin: {},
     request: {}
   },
 
@@ -173,6 +174,10 @@ stdclass.extend(Origin, stdclass, {
 
     if (hook.CONSIT['request']){
       hook.set('request', this.get('request'));
+    }
+
+    if (hook.CONSIT['bin']){
+      hook.set('bin', this.get('bin'));
     }
     hook.on('set:header', function(e){
       this.fire('set:header', e);

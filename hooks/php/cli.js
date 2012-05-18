@@ -21,7 +21,9 @@ stdclass.extend(Hook, stdclass, {
     initialized: true
   },
 
-  CONSIT: {},
+  CONSIT: {
+    bin: {}
+  },
 
   _init: function init(){
     this._bind();
@@ -59,7 +61,9 @@ stdclass.extend(Hook, stdclass, {
   _do: function _do(file, i, exist){
     if (!exist) return this._add();
 
-    var cmd = spawn('php', [file]);
+    var phpCmd = this.get('bin')['php'];
+
+    var cmd = spawn(phpCmd, [file]);
     var ret = [];
     var err = [];
     var self = this;

@@ -46,5 +46,8 @@
     ".ico": "image/x-icon",
     ".php": "text/html",
     ".htm": "text/html"
+  },
+  "bin": {
+    "php" : "php"
   }
 }

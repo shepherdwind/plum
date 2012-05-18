@@ -23,7 +23,8 @@ stdclass.extend(Hook, stdclass, {
   },
 
   CONSIT: {
-    request: {}
+    request: {},
+    bin: {}
   },
 
   _init: function init(){
@@ -69,7 +70,8 @@ stdclass.extend(Hook, stdclass, {
       this.fire('set:header', {type: '.txt'});
     }
 
-    var cmd = spawn('php', [TMS_PATH, file, +isBuild]);
+    var phpCmd = this.get('bin')['php'];
+    var cmd = spawn(phpCmd, [TMS_PATH, file, +isBuild]);
     var ret = [];
     var err = [];
     var self = this;
