@@ -62,6 +62,8 @@ stdclass.extend(Hook, stdclass, {
     if (!exist) return this._add();
 
     var phpCmd = this.get('bin')['php'];
+    phpCmd = path.resolve(__dirname, path.dirname(phpCmd)) + 
+             '/' + path.basename(phpCmd);
 
     var cmd = spawn(phpCmd, [file]);
     var ret = [];

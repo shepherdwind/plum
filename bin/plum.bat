@@ -1,1 +1,1 @@
-node plum
+node ./plum

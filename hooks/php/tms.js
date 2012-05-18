@@ -71,6 +71,8 @@ stdclass.extend(Hook, stdclass, {
     }
 
     var phpCmd = this.get('bin')['php'];
+    phpCmd = path.resolve(__dirname, path.dirname(phpCmd)) + 
+             '/' + path.basename(phpCmd);
     var cmd = spawn(phpCmd, [TMS_PATH, file, +isBuild]);
     var ret = [];
     var err = [];
