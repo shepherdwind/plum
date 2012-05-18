@@ -11,7 +11,12 @@ function init(){
   /**
    * 入口，读取配置文件
    */
-  fs.readFile(__dirname + '/server.json', 'utf-8', function(err, json){
+  var configPath = path.resolve(__dirname, '../') + '/server.json';
+  if (!path.existsSync(configPath)){
+    configPath = __dirname + '/server.json';
+  }
+
+  fs.readFile(configPath, 'utf-8', function(err, json){
 
     if (err) console.log(err);
 
