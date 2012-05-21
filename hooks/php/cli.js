@@ -62,10 +62,16 @@ stdclass.extend(Hook, stdclass, {
     if (!exist) return this._add();
 
     var phpCmd = this.get('bin')['php'];
-    phpCmd = path.resolve(__dirname, path.dirname(phpCmd)) + 
-             '/' + path.basename(phpCmd);
 
-    var cmd = spawn(phpCmd, [file]);
+    //如果是相对路径
+    if (phpCmd.indexOf('.') > -1){
+      phpCmd = path.resolve(__dirname, path.dirname(phpCmd)) + 
+               '/' + path.basename(phpCmd);
+    }
+
+    var basePath = path.dirname(file);
+
+    var cmd = spawn(phpCmd, [file], {cwd: basePath});
     var ret = [];
     var err = [];
     var self = this;
