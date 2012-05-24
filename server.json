@@ -1,38 +1,33 @@
 {
   "port": 80,
   "dirIndex": ["index.html"],
+  "groups": {
+    "statics": [".css", ".js", "imgs", ".swf"],
+    "imgs": [".png", ".gif", ".jpg", ".ico"]
+  },
   "servers": {
     "a.tbcdn.cn": {
       "path": "/Users/eward/assets",
+      "maps": {
+        "tmse/5137/assets/": {
+          "path": "/Users/eward/Sites/dev/nongye/demo/main",
+          "files": ["statics", ".less"]
+        }
+      },
       "hooks": {
-        ".css": ["proxy"], 
-        ".js": ["proxy"], 
-        ".png": ["proxy"], 
-        ".gif": ["proxy"], 
-        ".jpg": ["proxy"], 
-        ".swf": ["proxy"],
-        ".ico": ["proxy"]
+        "statics": ["proxy"]
       }
     },
     "assets.daily.taobao.net": {
-      "path": "/Users/eward/assets",
-      "hooks": {
-        ".css": ["proxy"], 
-        ".js": ["proxy"], 
-        ".png": ["proxy"], 
-        ".gif": ["proxy"], 
-        ".jpg": ["proxy"], 
-        ".swf": ["proxy"],
-        ".ico": ["proxy"]
-      }
+      "equal": "a.tbcdn.cn"
     },
     "market": {
       "path": "/Users/eward/Sites/dev/"
     }
   },
   "hooks": {
-    ".php" : ["php/tms", "php/cli"],
-    ".css" : ["less"]
+    ".css" : ["less"],
+    ".php" : ["php/tms", "php/cli"]
   },
   "MIME": {
     ".js": "application/x-javascript",

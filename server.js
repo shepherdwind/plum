@@ -5,6 +5,7 @@ var http = require('http');
 var path = require('path');
 var Origin = require('./hooks/origin');
 var config;
+var servers = {};
 var MIME;
 
 function init(){
@@ -68,18 +69,23 @@ Server.prototype = {
     var res = this.response;
 
     var host = req.headers.host;
+    var serverConfig = this.getServerConfig(host);
     var url = req.url;
     var files = this.parse(url);
     var ext = path.extname(files[0]);
-    var hosts = config.servers;
+    //var hosts = config.servers;
 
     //console.log(req.headers);
-    if (!hosts[host]){
+    if (!serverConfig){
       console.log('[Error], ' + host + ' is not defined in the config.json');
+      this.error({
+        type: '505',
+        message: '[Error], host ' + host + ' is not defined in the config.json'
+      });
       return;
     }
 
-    var basePath = hosts ? (hosts[host]['path'] || __dirname) : __dirname;
+    var basePath = serverConfig['path'] || __dirname;
 
     //处理路径问题，默认从dirIndex中读取，如果没有则显示list
     if (!ext){
@@ -93,14 +99,15 @@ Server.prototype = {
       !index ? (ext = '') : (files[0] = fileName);
     }
 
-    var hooks = this.getHooks(ext, host);
+    var hooks = serverConfig['hooks'][ext] || [];
 
     var cfg = {
       path: basePath,
       files: files,
       len: files.length,
       ext: ext,
-      hooks: hooks,
+      //引用引起的bug
+      hooks: hooks.slice(),
       time: []
     };
     this.hook(cfg);
@@ -169,7 +176,7 @@ Server.prototype = {
     var response = this.response;
     var file = e.file || '';
     console.log('[Error ' + e.type + ']: ' + file);
-    this.writeHead(e.type, {'Content-Type': MIME['.html']});
+    response.writeHead(e.type, {'Content-Type': MIME['.html']});
     response.write(e.message);
     response.end();
   },
@@ -192,15 +199,69 @@ Server.prototype = {
     });
   },
 
-  getHooks: function(ext, host){
-    if (!ext) return [];
-    try {
-      var ret = config['servers'][host]['hooks'] || [];
-      ret = ret[ext] || [];
-      var _hook = config['hooks'][ext] || [];
-      ret = ret.concat(_hook);
-      return ret;
-    } catch(e){ console.log(e); throw e;}
+  /**
+   * 合并equal并且，支持group配置
+   */
+  getServerConfig: function(server){
+
+    var cfg = config['servers'][server];
+    if (!cfg) return false;
+    if (!servers[server]){
+
+      //处理equal关系
+      if (!cfg.path && cfg.equal){
+        cfg = this.getServerConfig(cfg.equal);
+      } else {
+        cfg.hooks = cfg.hooks || {};
+        var hooks = cfg.hooks;
+        this.mixInHooks(hooks, hooks);
+        this.mixInHooks(hooks, config.hooks);
+      }
+
+      servers[server] = true;
+    } 
+    return cfg;
+  },
+
+  mixInHooks: function(hooks, datas){
+    Object.keys(datas).forEach(function(ext){
+      var hook = datas[ext];
+      if (ext[0] !== '.'){
+        var exts = this.getGroupExts(ext);
+        exts.forEach(function(ex){
+          hooks[ex] = hooks[ex] || [];
+          hooks[ex] = hooks[ex].concat(hook.slice());
+        });
+      } else {
+        hooks[ext] = hooks[ext] || [];
+        hooks[ext] = hooks[ext].concat(hook.slice());
+      }
+    }, this);
+    return hooks;
+  },
+
+  getGroupExts: function(group){
+    var ret = [];
+
+    getGroup(group);
+    function getGroup(ext){
+      try{
+        var exts = config['groups'][ext];
+
+        exts.forEach(function(extReal){
+          if (extReal[0] === '.'){
+            ret.push(extReal);
+          } else {
+            getGroup(extReal);
+          }
+        });
+      }catch(e){
+        throw new Error('Group ' + ext + ' not defined in config.json');
+      }
+    }
+
+    return ret;
+
   },
 
   /**

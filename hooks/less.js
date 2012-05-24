@@ -94,16 +94,19 @@ stdclass.extend(LessHook, stdclass, {
             console.log('[Error] lessc error on file ' + file);
           }
 
+          if (err) {
+            console.log(err.message);
+            data = err.message + ", on file " + file;
+          }
+
           self._add();
           self.fire('end', {index: i, data: data});
         });
 
       } catch(e){
-
         console.log(e.message);
         console.log('[Error] lessc error on file ' + file);
         self._add();
-
       }
     });
   }

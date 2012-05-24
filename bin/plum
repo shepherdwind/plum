@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
 var server = require('../server');
-console.log('Welcome to Plum, server started!');
-server();
+var fs = require('fs');
+fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
+  if (err) console.log(err);
+  var config = JSON.parse(json);
+  console.log('Welcome to Plum v' + config.version + 
+    ', server is running.\nPress key ctrl and c to quit!');
+  server();
+});
