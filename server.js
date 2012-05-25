@@ -99,7 +99,11 @@ Server.prototype = {
       !index ? (ext = '') : (files[0] = fileName);
     }
 
-    var hooks = serverConfig['hooks'][ext] || [];
+    try {
+      var hooks = serverConfig['hooks'][ext] || [];
+    } catch(e){
+      throw new Error(e);
+    }
 
     var cfg = {
       path: basePath,
@@ -114,7 +118,7 @@ Server.prototype = {
 
     var type = this.get('type');
     type = MIME[ext] || MIME['.html'];
-
+    this.set('type', type);
   },
 
   mixin: function(cfg){
@@ -150,7 +154,8 @@ Server.prototype = {
 
     hook.once('data', function(){
       res.writeHead(200, {
-        'Content-Type': this.get('type')
+        'Content-Type': this.get('type'),
+        'Server': 'Node'
       });
     }, this);
     hook.on('data', this.success, this);
@@ -176,7 +181,10 @@ Server.prototype = {
     var response = this.response;
     var file = e.file || '';
     console.log('[Error ' + e.type + ']: ' + file);
-    response.writeHead(e.type, {'Content-Type': MIME['.html']});
+    response.writeHead(e.type, {
+      'Content-Type': MIME['.html'],
+      'Server': 'Node'
+    });
     response.write(e.message);
     response.end();
   },
@@ -206,17 +214,18 @@ Server.prototype = {
 
     var cfg = config['servers'][server];
     if (!cfg) return false;
+
+    //处理equal关系
+    if (!cfg.path && cfg.equal){
+      cfg = this.getServerConfig(cfg.equal);
+    } 
+
     if (!servers[server]){
 
-      //处理equal关系
-      if (!cfg.path && cfg.equal){
-        cfg = this.getServerConfig(cfg.equal);
-      } else {
-        cfg.hooks = cfg.hooks || {};
-        var hooks = cfg.hooks;
-        this.mixInHooks(hooks, hooks);
-        this.mixInHooks(hooks, config.hooks);
-      }
+      cfg.hooks = cfg.hooks || {};
+      var hooks = cfg.hooks;
+      this.mixInHooks(hooks, hooks);
+      this.mixInHooks(hooks, config.hooks);
 
       servers[server] = true;
     } 

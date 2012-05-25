@@ -9,6 +9,9 @@ var PUB_SRV = 'assets.gslb.taobao.com';
 var IP_PUB;
 var USE_PRE = false;
 var IP_PRE = '110.75.14.33';
+var DAILY_IP = '10.232.16.2';
+var HOST = 'a.tbcdn.cn';
+var isDaily = false;
 
 function Proxy(){
   this.init.apply(this, arguments);
@@ -23,7 +26,9 @@ stdclass.extend(Proxy, stdclass, {
     initialized: false
   },
 
-  CONSIT: {},
+  CONSIT: {
+    request: {}
+  },
 
   _init: function init(){
     this._bind();
@@ -37,6 +42,7 @@ stdclass.extend(Proxy, stdclass, {
   },
 
   parse: function parse(){
+    this.selectServer();
     if (!this.get('initialized')) return;
     var files = this.get('files');
     var basePath = this.get('path');
@@ -56,15 +62,32 @@ stdclass.extend(Proxy, stdclass, {
     this.set('len', this.get('len') + 1);
   },
 
+  selectServer: function(){
+    var request = this.get('request');
+    var host = request.headers.host;
+    HOST = host;
+    if (host === 'assets.daily.taobao.net') {
+      this.set('initialized', true, false);
+      isDaily = true;
+    } else {
+      isDaily = false;
+    }
+  },
+
   _getIp: function getIp(){
     var self = this;
-    dns.resolve4(PUB_SRV, function (err, addresses) {
-      if (err) {
-        console.log('[Error]:Can\'t connect to ' + PUB_SRV);
-      }
-      IP_PUB = addresses[0];
-      self.set('initialized', true);
-    });
+
+    if (!IP_PUB){
+      dns.resolve4(PUB_SRV, function (err, addresses) {
+        if (err) {
+          console.log('[Error]:Can\'t connect to ' + PUB_SRV);
+        }
+        IP_PUB = addresses[0];
+        self.set('initialized', true);
+      });
+    } else {
+      self.set('initialized', true, false);
+    }
   },
 
   _loadRemote: function loadRemote(file, i, exist){
@@ -77,9 +100,9 @@ stdclass.extend(Proxy, stdclass, {
 
     http.get({
       headers: {
-        host: 'a.tbcdn.cn'
+        host: HOST
       },
-      host: USE_PRE ? IP_PRE : IP_PUB,
+      host: isDaily ? DAILY_IP : IP_PUB,
       port: 80,
       path: file
     }, function (res) {

@@ -4,7 +4,7 @@
   "keywords"      : ["less", "server", "proxy", "tms"],
   "author"        : "Eward Song<hanwen.sah@taobao.com>",
   "contributors"  : [],
-  "version"       : "0.2.2",
+  "version"       : "0.2.3",
   "bin"           : { "plum": "./bin/plum" },
   "main"          : "./server",
   "engines"       : { "node": ">=0.6.10" }
