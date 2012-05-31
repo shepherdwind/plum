@@ -61,10 +61,16 @@ stdclass.extend(Hook, stdclass, {
   },
 
   _do: function _do(file, i, exist){
-    if (!exist || file.indexOf('.tms') < 0) return this._add();
 
     var request = this.get('request');
-    var isBuild = request.url.indexOf('?build') > 0;
+    //url?build, url?a&build, url?a&build&b
+    var regBuild = /[\?&](build$)|(build&)/;
+    //url?tms&a, url/a.tms.php, url?a&tms
+    var regTms = /|(\.tms\.php)|([\?&]tms$)|[\?&]tms&/;
+    var url = request.url;
+    var isBuild = regBuild.test(url);
+
+    if (!exist || !regTms.test(url)) return this._add();
 
     if (isBuild){
       this.fire('set:header', {type: '.txt'});
