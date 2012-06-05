@@ -66,7 +66,7 @@ stdclass.extend(Hook, stdclass, {
     //url?build, url?a&build, url?a&build&b
     var regBuild = /[\?&](build$)|(build&)/;
     //url?tms&a, url/a.tms.php, url?a&tms
-    var regTms = /|(\.tms\.php)|([\?&]tms$)|[\?&]tms&/;
+    var regTms = /(\.tms\.php)|([\?&]tms$)|[\?&]tms&/;
     var url = request.url;
     var isBuild = regBuild.test(url);
 
