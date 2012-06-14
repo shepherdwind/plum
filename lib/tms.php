@@ -19,7 +19,7 @@ function repeatReplace ($file)
 
     if ($isBuild)
     {
-        echo $phpContent;
+        echo tms_handle_header_foot($phpContent);
     }
     else
     {
@@ -29,6 +29,46 @@ function repeatReplace ($file)
     }
 }
 
+/**
+ * 替换tms头尾部分，统一tms线下和本地环境
+ * @example
+ * $str = <<<EOF
+ * <?php include 'common/header.php'; ?>
+ * <link rel="stylesheet" href="a.css" />
+ * <!--head include('/home/admin/go/market/5137/__header.php') head-->
+ * <input type="hidden" value="home" id="J_NavId">
+ * code ..
+ * <!--foot include('/home/admin/go/market/5137/__footer.php') foot-->
+ * <script src="a.js" type="text/javascript"></script>
+ * <?php include 'common/foot.php'; ?>
+ * EOF;
+ *
+ * tms_handle_header_foot($str);
+ * return
+ * <?php include('/home/admin/go/market/5137/__header.php') ?>
+ * <input type="hidden" value="home" id="J_NavId">
+ * <?php  include('/home/admin/go/market/5137/__footer.php') ?>
+ */
+function tms_handle_header_foot($str)
+{
+    $commentStart = '<!--';
+    $commentEnd   = '-->';
+    $header       = 'head';
+    $foot         = 'foot';
+    $headLen      = strlen($commentStart . $header);
+    $footLen      = strlen($commentStart . $foot);
+
+    $headStart = strpos($str, $commentStart . $header);
+    $headEnd   = strpos($str, $header . $commentEnd);
+    $footStart = strpos($str, $commentStart . $foot);
+    $footEnd   = strpos($str, $foot . $commentEnd);
+
+    $start = substr($str, $headStart + $headLen, $headEnd - $headStart - $headLen);
+    $end   = substr($str, $footStart + $footLen, $footEnd - $footStart - $footLen);
+    $mid   = substr($str, $headEnd + $headLen - 1, $footStart - $headEnd - $headLen + 1);
+    return '<?php ' . $start . '?>' . $mid . '<?php ' . $end . '?>';
+
+}
 /**
  * 处理依赖关系include
  */
@@ -88,13 +128,13 @@ function _tms_common ( $args, $attributes = '') {
 }
 
 function tb_json_encode($value, $options = 0) { 
-	return json_encode(tb_json_convert_encoding($value, "GBK", "UTF-8")); 
+    return json_encode(tb_json_convert_encoding($value, "GBK", "UTF-8")); 
 } 
 
 function tb_json_decode($str, $assoc = false, $depth = 512) 
 { 
-	$str = iconv('gbk','utf-8',$str);
-	return tb_json_convert_encoding(json_decode($str, $assoc), "UTF-8", "GBK"); 
+    $str = iconv('gbk','utf-8',$str);
+    return tb_json_convert_encoding(json_decode($str, $assoc), "UTF-8", "GBK"); 
 } 
 
 function tb_json_convert_encoding($m, $from, $to) 
