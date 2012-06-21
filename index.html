@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Plum by shepherdwind</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Plum</h1>
+        <p>Demo server environment by node</p>
+
+        <p class="view"><a href="https://github.com/shepherdwind/plum">View the Project on GitHub <small>shepherdwind/plum</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/shepherdwind/plum/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/shepherdwind/plum/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/shepherdwind/plum">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Plum</h1>
+
+<p>基于node的Demo服务器。Node作为http请求控制中心，通过<code>server.json</code>配置，根据请求
+域名，找到所请求的文件，同时根据服务器配置的<code>hook</code>，对文件执行解析分发。</p>
+
+<h2>Use</h2>
+
+<pre><code>  sudo npm install plum -g
+  sudo plum
+</code></pre>
+
+<p>依赖php cli和node的less模块，请首先安装。</p>
+
+<h2>config</h2>
+
+<p>配置文件: <code>server.json</code>。配置方式和Apache基本一直，不过没有那么复杂。</p>
+
+<ul>
+<li>
+<em>port</em>: 端口，默认80</li>
+<li>
+<em>dirIndex</em>: 目录中默认查找文件</li>
+<li>
+<em>servers</em>: 虚拟主机相关配置，包括域名对应的base路径和特定hooks</li>
+<li>
+<em>hooks</em>: 全局hook，比如.php: php，所有的php文件都会通过<code>hooks/php.js</code>执行</li>
+<li>
+<p><em>MIME</em>: 需要支持的文件类型</p>
+
+<pre><code>{
+  "port": 80,
+    "dirIndex": ["index.html", ..],
+    "servers": {
+      "a.tbcdn.cn": {
+        "path": "/Users/eward/assets",
+        "hooks": {
+          ".css": ["proxy"], 
+          ...
+        }
+      },
+      ...
+    },
+    "hooks": {
+      ".php" : ["php"],
+      ".css" : ["less"]
+    },
+    "MIME": {
+      ".js": "application/x-javascript",
+      ...
+    }
+}
+</code></pre>
+</li>
+</ul><h2>hooks</h2>
+
+<p><a href="https://github.com/shepherdwind/plum/blob/master/hooks/README.md">文档</a>。
+server.js是入口文件，完成请求分发工作。主要解析过程由hooks目录下的js执行。</p>
+
+<ul>
+<li>
+<p><em>origin</em></p>
+
+<p>origin首先判断请求为文件还是目录，如果是目录，生成目录列表。如果是文件，根据文
+件后缀，初始化相对于的hook，并且接受hook发送数据请求事件。控制文件输出到客户端
+的属性，和错误情况的处理。同时，在没有hook的情况下，完成静态文件读取的功能。</p>
+</li>
+<li>
+<p><em>hook*和*hook-simple</em></p>
+
+<p>这两个是hook规范事例，并没有具体实现，是扩展hook的规范</p>
+</li>
+<li>
+<p><em>less</em></p>
+
+<p>less完成less解析工作，初始化时，判断文件相对应的less文件是否存在，如果存在执行
+less编译，返回结果，如果不存在，退出，交给origin处理。</p>
+</li>
+<li>
+<p><em>proxy</em></p>
+
+<p>淘宝cdn代理实现。初始化时候，首先判断文件在本地是否存在(文件查找规则由请求url
+和 server.json配置的path决定)，如果不存在，从cdn服务器获取数据。如果存在，则退
+出，origin处理自动。</p>
+</li>
+<li>
+<p><em>php/cli</em></p>
+
+<p>通过php cli解析php文件，现在还不支持post和get请求，作为demo环境基本够用，执行
+效率和由php 自身性能决定，和转发者是node还是apache无关。</p>
+</li>
+<li>
+<p><em>php/tms</em></p>
+
+<p>模拟tms函数，生成demo。判断规则是：文件是php，并且含有.tms，tms规则支持tms文件
+引用，不过要求，每次只引用一个文件(<code>&lt;?php include 'a.tms.php';?&gt;</code>)，而且文件名
+中含有.tms。demo的数据根据请求的文件名，把后缀改为json，比如访问a.tms.php，demo
+数据源为a.tms.json，运行时，每个函数通过name来定位数据。</p>
+</li>
+</ul><h2>change log</h2>
+
+<ul>
+<li>[2012-06-12 15:44:03] 
+
+<ul>
+<li>增加<code>proxy=pre</code>作为使用预发assets的接口</li>
+<li>tms规则下，build时，生成文件名对应的html文件，用于fed上预览</li>
+<li>去除tms规则下，引用模块文件名必须以<code>.tms.php</code>结尾的规则</li>
+<li>tms规则下，自动生成.json文件，方便修改</li>
+<li>增加自动更新提示</li>
+</ul>
+</li>
+</ul><h2>TODO</h2>
+
+<ul>
+<li>php使用php-cgi和fpm来执行。对fpm和php-cgi不是很了解，学习中。</li>
+<li>vm模板解析</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/shepherdwind">shepherdwind</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
