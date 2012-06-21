@@ -2,10 +2,44 @@
 
 var server = require('../server');
 var fs = require('fs');
+var http = require('https');
+
+function getVersion(cb){
+  http.get({
+    host: 'raw.github.com',
+    method: 'GET',
+    port: 443,
+    path: '/shepherdwind/plum/master/package.json'
+  }, function(ret){
+    var rets = '';
+    ret.on('data', function(data){
+      rets += data.toString();
+    });
+    ret.on('end', function(){
+      cb(JSON.parse(rets).version);
+    });
+  }).on('error', function(e){
+    console.log(e);
+  });
+}
+
+var red   = '\u001b[31m';
+var reset = '\u001b[0m';
+
 fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
   if (err) console.log(err);
   var config = JSON.parse(json);
   console.log('Welcome to Plum v' + config.version + 
     ', server is running.\nPress key ctrl and c to quit!');
+
+  getVersion(function(version){
+    if (version > config.version){
+      setInterval(function(){
+        console.log( red + 
+          'the newest version is ' + version + ', pleace update !!' + reset);
+      }, 10000)
+    }
+  });
+
   server();
 });

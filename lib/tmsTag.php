@@ -69,6 +69,7 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
     /** 合并特殊值 */
     $defaults = tms_parse_args ( $attributes , $defaults );
     $r = tms_parse_args ( $args ,$defaults );
+    $myFileds = array();
 
     /** 处理_tms_custom自定义fields */
     if ( isset($r['fields']) AND $r['fields'] !='' ) {
@@ -90,6 +91,7 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
 			$imgmatch = preg_match('/\[([\dx]*)]\:img/',$key,$math);
             $key = explode( ':',$key );
             $r2 +=  array( $key[0] => $key[2] );
+            $myFileds[] = $key[0];
             if( $imgmatch ) {
               $mathImg[$index][$key[2]] = $math[1];
             }
@@ -136,9 +138,17 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
     }
 
 
+    $filter = array('row', 'defaultRow', 'title', 'name', 'group');
     $r3 = array();
     for ( $i = 0; $i < $r['defaultRow']; $i++ ) {
-        array_push( $r3,$r );
+        //array_push( $r3,$r );
+        $rets = array();
+        foreach($r as $key => $val) {
+            if (!in_array($key, $filter) || in_array($key, $myFileds)){
+                $rets[$key] = $val;
+            }
+        }
+        $r3[] = $rets;
     }
 
     return $r3;

@@ -6,7 +6,14 @@
 $file = $_SERVER['argv'][1];
 $isBuild = $_SERVER['argv'][2];
 $json_file = str_replace('.php', '.json', $file);
-$jsonData = tb_json_decode(@file_get_contents($json_file), true);
+$html_file = str_replace('.php', '.html', $file);
+if (file_exists($json_file)){
+    $jsonData = tb_json_decode(@file_get_contents($json_file), true);
+    $createFile = false;
+} else {
+    $createFile = true;
+    $jsonData = array();
+}
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname($file));
 include('tmsTag.php');
 
@@ -14,11 +21,19 @@ repeatReplace($file);
 
 function repeatReplace ($file) 
 {
-    global $isBuild;
+    global $isBuild, $jsonData, $json_file, $createFile, $html_file;
     $phpContent = tms_include($file);
 
     if ($isBuild)
     {
+        ob_start();
+        $phpContent = preg_replace('/_tms_repeat_begin\((?:.+?)row["\']\s*\:\s*[\'"]([^\'"]+)[\'"]?(?:[^\)]+)\)\s*\;?/',"for (\$_i_tms = 0; \$_i_tms < $1; \$_i_tms++) {", $phpContent);
+        $phpContent = preg_replace('/_tms_repeat_end\(\s*\)\;?/i','}',$phpContent);
+        eval('?>'.$phpContent.'<?');
+        file_put_contents($html_file, ob_get_contents());
+        chmod($html_file, 0755);
+        ob_end_clean();
+
         echo tms_handle_header_foot($phpContent);
     }
     else
@@ -26,6 +41,11 @@ function repeatReplace ($file)
         $phpContent = preg_replace('/_tms_repeat_begin\((?:.+?)row["\']\s*\:\s*[\'"]([^\'"]+)[\'"]?(?:[^\)]+)\)\s*\;?/',"for (\$_i_tms = 0; \$_i_tms < $1; \$_i_tms++) {", $phpContent);
         $phpContent = preg_replace('/_tms_repeat_end\(\s*\)\;?/i','}',$phpContent);
         eval('?>'.$phpContent.'<?');
+    }
+
+    if ($createFile){
+        file_put_contents($json_file, indent(tb_json_encode($jsonData)));
+        chmod($json_file, 0755);
     }
 }
 
@@ -77,7 +97,7 @@ function tms_include($file)
     $dir = dirname($file);
     $str = file_get_contents($file);
     $strs = explode('?>', $str);
-    $reg = '/(?:include|include_once|require|require_once)\s[\'"]([\w\.-_]+\.tms\.php)[\'"];?/';
+    $reg = '/(?:include|include_once|require|require_once)\s[\'"]([\w\.-_]+\.php)\?inc[\'"];?/';
 
     $ret = '';
 
@@ -120,10 +140,13 @@ function tms_include($file)
 function _tms_common ( $args, $attributes = '') {
     global $jsonData;
     $json = json_decode(iconv('gbk', 'utf-8', $args), true);
-    if ($jsonData AND array_key_exists($json['name'], $jsonData)) {
+    if (count($jsonData) AND array_key_exists($json['name'], $jsonData)) {
         return $jsonData[$json['name']];
     } else {
-        return tms_common($args , $attributes);
+        $data = tms_common($args , $attributes);
+        $jsonData[$json['name']] = $data;
+        $createFile = true;
+        return $data;
     }
 }
 
@@ -185,4 +208,60 @@ function tms_parse_args( $args, $defaults = '' ) {
     if ( is_array( $defaults ) )
         return array_merge( $defaults, $r );
     return $r;
+}
+
+/**
+ * Indents a flat JSON string to make it more human-readable.
+ * @param string $json The original JSON string to process.
+ * @return string Indented version of the original JSON string.
+ */
+function indent($json) {
+
+    $result      = '';
+    $pos         = 0;
+    $strLen      = strlen($json);
+    $indentStr   = '  ';
+    $newLine     = "\n";
+    $prevChar    = '';
+    $outOfQuotes = true;
+
+    for ($i=0; $i<=$strLen; $i++) {
+
+        // Grab the next character in the string.
+        $char = substr($json, $i, 1);
+
+        // Are we inside a quoted string?
+        if ($char == '"' && $prevChar != '\\') {
+            $outOfQuotes = !$outOfQuotes;
+        
+        // If this character is the end of an element, 
+        // output a new line and indent the next line.
+        } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+            $result .= $newLine;
+            $pos --;
+            for ($j=0; $j<$pos; $j++) {
+                $result .= $indentStr;
+            }
+        }
+        
+        // Add the character to the result string.
+        $result .= $char;
+
+        // If the last character was the beginning of an element, 
+        // output a new line and indent the next line.
+        if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+            $result .= $newLine;
+            if ($char == '{' || $char == '[') {
+                $pos ++;
+            }
+            
+            for ($j = 0; $j < $pos; $j++) {
+                $result .= $indentStr;
+            }
+        }
+        
+        $prevChar = $char;
+    }
+
+    return $result;
 }

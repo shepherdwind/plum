@@ -1,9 +1,10 @@
 'use strict';
 var stdclass = require('../lib/stdclass');
-var path = require('path');
-var http = require('http');
-var dns = require('dns');
-var fs = require('fs');
+var path     = require('path');
+var http     = require('http');
+var dns      = require('dns');
+var fs       = require('fs');
+var url      = require('url');
 
 var PUB_SRV = 'assets.gslb.taobao.com';
 var IP_PUB;
@@ -66,10 +67,18 @@ stdclass.extend(Proxy, stdclass, {
     var request = this.get('request');
     var host = request.headers.host;
     HOST = host;
+    var referer = request.headers.referer;
     if (host === 'assets.daily.taobao.net') {
       this.set('initialized', true, false);
       isDaily = true;
     } else {
+      var uri = url.parse(referer, true);
+      //使用预发
+      if (uri.query && uri.query.proxy == 'pre'){
+        IP_PUB = IP_PRE;
+        this.set('initialized', true, false);
+      }
+
       isDaily = false;
     }
   },

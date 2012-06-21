@@ -81,6 +81,15 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
   中含有.tms。demo的数据根据请求的文件名，把后缀改为json，比如访问a.tms.php，demo
   数据源为a.tms.json，运行时，每个函数通过name来定位数据。
 
+##change log
+
+- [2012-06-12 15:44:03] 
+  - 增加`proxy=pre`作为使用预发assets的接口
+  - tms规则下，build时，生成文件名对应的html文件，用于fed上预览
+  - 去除tms规则下，引用模块文件名必须以`.tms.php`结尾的规则
+  - tms规则下，自动生成.json文件，方便修改
+  - 增加自动更新提示
+
 ##TODO
 
 - php使用php-cgi和fpm来执行。对fpm和php-cgi不是很了解，学习中。
