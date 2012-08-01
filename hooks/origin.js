@@ -26,6 +26,7 @@ stdclass.extend(Origin, stdclass, {
     step: 0,
     //born | begin | initialized | end
     status: 'born',
+    onRuning: {},
     //记录总执行时间
     time: [],
     hooks: []
@@ -193,6 +194,11 @@ stdclass.extend(Origin, stdclass, {
       this._endData(e.data, e.index);
     }, this);
 
+    hook.on('running', function(e){
+      var onRuning = this.get('onRuning');
+      onRuning[e] = true;
+    }, this);
+
     hook.on('change:len:' + len, function(){
       var hooks = this.get('hooks');
       hooks.shift();
@@ -251,7 +257,9 @@ stdclass.extend(Origin, stdclass, {
 
     var path = this.get('path');
     var filePath = path + file;
-    if (file) this._steamRead(filePath, i);
+    var onRuning = this.get('onRuning');
+    //防止文件重复规则
+    if (file && !onRuning[file]) this._steamRead(filePath, i);
   },
 
   _steamRead: function steamRead(filePath, i){
@@ -265,7 +273,6 @@ stdclass.extend(Origin, stdclass, {
 
     steam.on('data', function(data){
       self._pushData(data, i);
-      //ret.push(data);
     });
 
     steam.on('end', function(){
@@ -276,6 +283,7 @@ stdclass.extend(Origin, stdclass, {
     });
 
     steam.on('error', function(err){
+      if (filePath.indexOf('favicon.ico') !== -1) return;
       console.log('[Error ' + err.code + ']' + err.message);
       var errObj = {message: err.message, file: filePath, index: i, type: 500};
       if (err.errno == 34){

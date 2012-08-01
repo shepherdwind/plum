@@ -144,6 +144,10 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
         //array_push( $r3,$r );
         $rets = array();
         foreach($r as $key => $val) {
+            if (preg_match('/^http:\/\/img\.f2e\.taobao\.net(.*)/i', $val)) {
+                $val = preg_replace('/\.jpg(.*)/i', '.jpg?t=' . md5(microtime()), $val);
+            }
+
             if (!in_array($key, $filter) || in_array($key, $myFileds)){
                 $rets[$key] = $val;
             }

@@ -55,6 +55,7 @@ stdclass.extend(LessHook, stdclass, {
 
     var self = this;
     var files = this.get('files');
+    this.fire('running', files[i]);
 
     var request = this.get('request');
     var referer = request.headers['referer'];

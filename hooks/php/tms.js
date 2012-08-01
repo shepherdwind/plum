@@ -4,10 +4,11 @@
  */
 'use strict';
 var stdclass = require('../../lib/stdclass');
-var path = require('path');
-var fs = require('fs');
-var spawn = require('child_process').spawn;
+var path     = require('path');
+var fs       = require('fs');
+var spawn    = require('child_process').spawn;
 var TMS_PATH = path.resolve(__dirname, '../../lib/') + '/tms.php';
+var URL      = require('url');
 
 function Hook(){
   this.init.apply(this, arguments);
@@ -67,10 +68,11 @@ stdclass.extend(Hook, stdclass, {
     var regBuild = /[\?&](build$)|(build&)/;
     //url?tms&a, url/a.tms.php, url?a&tms
     var regTms = /(\.tms\.php)|([\?&]tms$)|[\?&]tms&/;
-    var url = request.url;
-    var isBuild = regBuild.test(url);
+    var url = URL.parse(request.url, true);
+    var isBuild = 'build' in url.query;
+    var syntax = 'syntax' in url.query;
 
-    if (!exist || !regTms.test(url)) return this._add();
+    if (!exist || !regTms.test(request.url)) return this._add();
 
     if (isBuild){
       this.fire('set:header', {type: '.txt'});
@@ -83,7 +85,7 @@ stdclass.extend(Hook, stdclass, {
                '/' + path.basename(phpCmd);
     }
 
-    var cmd = spawn(phpCmd, [TMS_PATH, file, +isBuild]);
+    var cmd = spawn(phpCmd, [TMS_PATH, file, +isBuild, +syntax]);
     var ret = [];
     var err = [];
     var self = this;

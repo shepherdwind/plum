@@ -5,6 +5,7 @@
 
 $file = $_SERVER['argv'][1];
 $isBuild = $_SERVER['argv'][2];
+$isSyntax = $_SERVER['argv'][3];
 $json_file = str_replace('.php', '.json', $file);
 $html_file = str_replace('.php', '.html', $file);
 if (file_exists($json_file)){
@@ -14,10 +15,15 @@ if (file_exists($json_file)){
     $createFile = true;
     $jsonData = array();
 }
-ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname($file));
+ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname($file) . '/');
 include('tmsTag.php');
 
-repeatReplace($file);
+if ($isSyntax){
+    error_reporting(E_ALL);
+    include $file;
+} else {
+    repeatReplace($file);
+}
 
 function repeatReplace ($file) 
 {
@@ -97,7 +103,7 @@ function tms_include($file)
     $dir = dirname($file);
     $str = file_get_contents($file);
     $strs = explode('?>', $str);
-    $reg = '/(?:include|include_once|require|require_once)\s[\'"]([\w\.-_]+\.php)\?inc[\'"];?/';
+    $reg = '/(?:include|include_once|require|require_once)\s[\'"]([\w\.-_]+\.(?:php|css|js))\?inc[\'"];?/';
 
     $ret = '';
 
@@ -138,7 +144,7 @@ function tms_include($file)
 
 
 function _tms_common ( $args, $attributes = '') {
-    global $jsonData;
+    global $jsonData, $createFile;
     $json = json_decode(iconv('gbk', 'utf-8', $args), true);
     if (count($jsonData) AND array_key_exists($json['name'], $jsonData)) {
         return $jsonData[$json['name']];
