@@ -5,6 +5,7 @@ var http     = require('http');
 var dns      = require('dns');
 var fs       = require('fs');
 var url      = require('url');
+var exists = fs.exists || path.exists;
 
 var PUB_SRV = 'assets.gslb.taobao.com';
 var IP_PUB;
@@ -51,7 +52,7 @@ stdclass.extend(Proxy, stdclass, {
     files.forEach(function(file, i){
       if (file !== false){
         var filePath = basePath + file;
-        path.exists(filePath, this._loadRemote.bind(this, file, i));
+        exists(filePath, this._loadRemote.bind(this, file, i));
       } else {
         this._add();
       }

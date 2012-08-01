@@ -9,6 +9,7 @@ var fs       = require('fs');
 var spawn    = require('child_process').spawn;
 var TMS_PATH = path.resolve(__dirname, '../../lib/') + '/tms.php';
 var URL      = require('url');
+var exists = fs.exists || path.exists;
 
 function Hook(){
   this.init.apply(this, arguments);
@@ -49,7 +50,7 @@ stdclass.extend(Hook, stdclass, {
       if (file === false) return this._add();
 
       var filePath = basePath + file;
-      path.exists(filePath, this._do.bind(this, filePath, i));
+      exists(filePath, this._do.bind(this, filePath, i));
 
       return null;
 

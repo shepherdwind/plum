@@ -7,6 +7,7 @@ var stdclass = require('../../lib/stdclass');
 var path = require('path');
 var http = require('http');
 var fs = require('fs');
+var exists = fs.exists || path.exists;
 
 function Hook(){
   this.init.apply(this, arguments);
@@ -42,7 +43,7 @@ stdclass.extend(Hook, stdclass, {
     files.forEach(function(file, i){
       if (file === false) return this._add();
 
-      path.exists(filePath, this._do.bind(this, file, i));
+      exists(filePath, this._do.bind(this, file, i));
 
       return null;
 

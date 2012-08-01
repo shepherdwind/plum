@@ -7,13 +7,14 @@ var Origin = require('./hooks/origin');
 var config;
 var servers = {};
 var MIME;
+var existsSync = fs.existsSync || path.existsSync;
 
 function init(){
   /**
    * 入口，读取配置文件
    */
   var configPath = path.resolve(__dirname, '../') + '/server.json';
-  if (!path.existsSync(configPath)){
+  if (!existsSync(configPath)){
     configPath = __dirname + '/server.json';
   }
 
@@ -94,7 +95,7 @@ Server.prototype = {
         //如果是dir, 则只有一个文件,即files.length == 1
         fileName = files[0] + file;
         ext = path.extname(file);
-        return path.existsSync(basePath + fileName);
+        return existsSync(basePath + fileName);
       });
       !index ? (ext = '') : (files[0] = fileName);
     }

@@ -2,6 +2,7 @@ var stdclass = require('../lib/stdclass');
 var path = require('path');
 var fs = require('fs');
 var less = require('less');
+var exists = fs.exists || path.exists;
 
 function LessHook(){
   this.init.apply(this, arguments);
@@ -39,7 +40,7 @@ stdclass.extend(LessHook, stdclass, {
       } else {
 
         var filePath = basePath + file.replace('.css', '.less');
-        path.exists(filePath, this._lessc.bind(this, filePath, i));
+        exists(filePath, this._lessc.bind(this, filePath, i));
 
       }
     }, this);
