@@ -103,8 +103,8 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
         foreach ( $r2 as &$key2 ) {
             switch ( $key2 ) {
             case "boolean":
-                //$key2 = (0==rand(0, 1)) ? true : false;
-                $key2 = "_TMS_BOOLEAN";
+                $key2 = false;
+                //$key2 = "_TMS_BOOLEAN";
                 break;
             case "string":
                 $key2 = _TMS_TEXT;

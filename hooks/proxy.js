@@ -73,9 +73,9 @@ stdclass.extend(Proxy, stdclass, {
       this.set('initialized', true, false);
       isDaily = true;
     } else {
-      var uri = url.parse(referer, true);
+      var uri = referer && url.parse(referer, true);
       //使用预发
-      if (uri.query && uri.query.proxy == 'pre'){
+      if (uri && uri.query && uri.query.proxy == 'pre'){
         IP_PUB = IP_PRE;
         this.set('initialized', true, false);
       }
