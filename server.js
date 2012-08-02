@@ -8,6 +8,7 @@ var config;
 var servers = {};
 var MIME;
 var existsSync = fs.existsSync || path.existsSync;
+var URL = require('url');
 
 function init(){
   /**
@@ -71,9 +72,13 @@ Server.prototype = {
 
     var host = req.headers.host;
     var serverConfig = this.getServerConfig(host);
-    var url = req.url;
+    var url = URL.parse(req.url).path;
     var files = this.parse(url);
     var ext = path.extname(files[0]);
+    if (url === '/favicon.ico') {
+      res.end();
+      return;
+    }
     //var hosts = config.servers;
 
     //console.log(req.headers);
