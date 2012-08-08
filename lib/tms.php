@@ -32,6 +32,7 @@ function repeatReplace ($file)
 
     if ($isBuild)
     {
+        echo tms_handle_header_foot($phpContent);
         ob_start();
         $phpContent = preg_replace('/_tms_repeat_begin\((?:.+?)row["\']\s*\:\s*[\'"]([^\'"]+)[\'"]?(?:[^\)]+)\)\s*\;?/',"for (\$_i_tms = 0; \$_i_tms < $1; \$_i_tms++) {", $phpContent);
         $phpContent = preg_replace('/_tms_repeat_end\(\s*\)\;?/i','}',$phpContent);
@@ -39,8 +40,6 @@ function repeatReplace ($file)
         file_put_contents($html_file, ob_get_contents());
         chmod($html_file, 0755);
         ob_end_clean();
-
-        echo tms_handle_header_foot($phpContent);
     }
     else
     {

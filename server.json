@@ -1,48 +1,96 @@
 {
-  "port": 80,
-  "dirIndex": ["index.html"],
-  "groups": {
-    "statics": [".css", ".js", "imgs", ".swf"],
-    "imgs": [".png", ".gif", ".jpg", ".ico"]
+  "port":80,
+  "dirIndex":[
+    "index.html",
+    "index.php"
+  ],
+  "www":"/Users/eward/Sites/",
+  "groups":{
+    "statics":[
+      ".css",
+      ".js",
+      "imgs",
+      ".swf"
+    ],
+    "imgs":[
+      ".png",
+      ".gif",
+      ".jpg",
+      ".ico"
+    ]
   },
-  "servers": {
-    "a.tbcdn.cn": {
-      "path": "/Users/eward/assets",
-      "maps": {
-        "tmse/5137/assets/": {
-          "path": "/Users/eward/Sites/dev/nongye/demo/main",
-          "files": ["statics", ".less"]
+  "servers":{
+    "a.tbcdn.cn":{
+      "path":"/Users/eward/assets",
+      "maps":{
+        "/tmse/5137/assets/":{
+          "path":"/Users/eward/Sites/dev/nongye/sdk/assets/",
+          "hooks":{
+            ".css":[
+              "less"
+            ],
+            "statics":[
+              "statics"
+            ]
+          }
         }
       },
-      "hooks": {
-        "statics": ["proxy"]
+      "hooks":{
+        "statics":[
+          "proxyAll"
+        ]
       }
     },
-    "assets.daily.taobao.net": {
-      "equal": "a.tbcdn.cn"
+    "assets.daily.taobao.net":{
+      "equal":"a.tbcdn.cn"
     },
-    "market": {
-      "path": "/Users/eward/Sites/dev/"
+    "market":{
+      "path":"/Users/eward/Sites/dev/"
     }
   },
-  "hooks": {
-    ".css" : ["less"],
-    ".php" : ["php/tms", "php/cli"]
+  "hooks":{
+    ".css":[
+      "less"
+    ],
+    ".php":[
+      "php/tms",
+      "php/proxy"
+    ]
   },
-  "MIME": {
-    ".js": "application/x-javascript",
-    ".css": "text/css",
-    ".txt": "text/plain",
-    ".png": "image/png",
-    ".gif": "image/gif",
-    ".jpg": "image/jpeg",
-    ".swf": "application/x-shockwave-flash",
-    ".html": "text/html",
-    ".ico": "image/x-icon",
-    ".php": "text/html",
-    ".htm": "text/html"
+  "MIME":{
+    ".js":"application/x-javascript",
+    ".css":"text/css",
+    ".txt":"text/plain",
+    ".png":"image/png",
+    ".gif":"image/gif",
+    ".jpg":"image/jpeg",
+    ".swf":"application/x-shockwave-flash",
+    ".html":"text/html",
+    ".ico":"image/x-icon",
+    ".php":"text/html",
+    ".htm":"text/html"
   },
-  "bin": {
-    "php" : "php"
+  "bin":{
+    "php":"php"
+  },
+  "logFiles":[
+    {
+      "path":"tmse/5137/assets",
+      "ext":[
+        ".css",
+        ".js"
+      ]
+    }
+  ],
+  "logHooks":[
+    "less"
+  ],
+  "logBasic":false,
+  "debug":false,
+  "proxyAll": {
+    "use_pre": false
+  },
+  "less": {
+    "build": false
   }
 }

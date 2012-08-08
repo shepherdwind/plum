@@ -13,6 +13,7 @@ stdclass.extend(LessHook, stdclass, {
   attributes: {
     path: '',
     files: [],
+    maps: {},
     len: 0
   },
 
@@ -39,8 +40,10 @@ stdclass.extend(LessHook, stdclass, {
         this._add();
       } else {
 
-        var filePath = basePath + file.replace('.css', '.less');
-        exists(filePath, this._lessc.bind(this, filePath, i));
+        var maps = this.get('maps');
+        var filePath = maps[file] || basePath + file;
+        filePath = filePath.replace('.css', '.less');
+        exists(filePath, this._lessc.bind(this, file, filePath, i));
 
       }
     }, this);
@@ -50,13 +53,20 @@ stdclass.extend(LessHook, stdclass, {
     this.set('len', this.get('len') + 1);
   },
 
-  _lessc: function lessc(file, i, exist){
+  _lessc: function lessc(file, filePath, i, exist){
 
-    if (!exist) return this._add();
+    if (!exist){
+      //拒绝处理
+      this.fire('reject', {file: file, index: i});
+      this._add();
+      return;
+    }
+    //接受处理
+    this.fire('receive', {file: file, index: i});
+    this._add();
 
     var self = this;
     var files = this.get('files');
-    this.fire('running', files[i]);
 
     var request = this.get('request');
     var referer = request.headers['referer'];
@@ -66,13 +76,13 @@ stdclass.extend(LessHook, stdclass, {
     }
 
     var parser = new(less.Parser)({
-      paths: [path.dirname(file)], 
-      filename: path.basename(file)
+      paths: [path.dirname(filePath)], 
+      filename: path.basename(filePath)
     });
 
-    fs.readFile(file, function readFile(err, css){
+    fs.readFile(filePath, function readFile(err, css){
 
-      if (err) return self._add();
+      if (err) return ;
 
       try {
 
@@ -82,7 +92,7 @@ stdclass.extend(LessHook, stdclass, {
             data = tree.toCSS();
 
             if (isWriteFile){
-              fs.writeFile(file.replace('.less', '.css'), data, function (err) {
+              fs.writeFile(filePath.replace('.less', '.css'), data, function (err) {
                 if (err) {
                   console.log(err);
                 } else {
@@ -101,14 +111,12 @@ stdclass.extend(LessHook, stdclass, {
             data = err.message + ", on file " + file;
           }
 
-          self._add();
           self.fire('end', {index: i, data: data});
         });
 
       } catch(e){
         console.log(e.message);
         console.log('[Error] lessc error on file ' + file);
-        self._add();
       }
     });
   }

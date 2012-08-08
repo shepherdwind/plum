@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Plum配置页</title>
+</head>
+<body>
+<style type="text/css">
+form,
+pre {
+width: 600px;
+margin: 20px auto;
+padding: 10px;
+border: 1px solid #123;
+}
+form {
+  border: none;
+}
+</style>
+  <pre contentEditable id="J_data">
+  {{config}}
+  </pre>
+  <form action="config.html" method="post" id="J_form">
+  <input name="config" type="hidden" id="J_config"/>
+  <input type="submit" value="重新配置服务器&rarr;">
+  </form>
+  <script type="text/javascript">
+    var _$ = function(id){
+      return document.getElementById(id);
+    };
+    _$('J_form').onsubmit = setData;
+    function setData(){
+      var input = _$('J_config');
+      var data = _$('J_data');
+      input.value = data.innerText || data.textContent;
+      try {
+        var config = JSON.parse(input.value);
+      } catch(e){
+        console.log(e);
+      }
+      if (!config){
+        alert('json 解析错误，请看控制台错误信息');
+        return false;
+      }
+    }
+  </script>
+</body>
+</html>  

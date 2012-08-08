@@ -17,6 +17,10 @@ stdclass.extend(Origin, stdclass, {
   attributes: {
     path: '',
     files: [],
+    //maps对应的文件
+    _files: [],
+    //文件路径映射
+    maps: [],
     ext: '',
     //等于文件总数目
     len: 0,
@@ -26,7 +30,7 @@ stdclass.extend(Origin, stdclass, {
     step: 0,
     //born | begin | initialized | end
     status: 'born',
-    onRuning: {},
+    received: {},
     //记录总执行时间
     time: [],
     hooks: []
@@ -52,6 +56,7 @@ stdclass.extend(Origin, stdclass, {
     //log信息贮存，在结束后统一输出，以免和其他请求的混合在一起
     this.log = [];
     this._bind();
+    this.attributes.received = {};
 
     for (var i = 0; i < this.get('len'); i++) {
       this.data[i] = [];
@@ -63,7 +68,11 @@ stdclass.extend(Origin, stdclass, {
     }, this.get('TIME_OUT'));
 
     this._recodeTime();
-    this.log.push('[Origin begin]:' + this.get('len') + ' files');
+    this.log.push({
+      msg: '[Origin begin]:' + this.get('len') + 
+      ' files(' + this.get('files').map(path.basename) + ')', 
+      type: 'begin'
+    });
 
   },
 
@@ -75,7 +84,10 @@ stdclass.extend(Origin, stdclass, {
     this.on('change:now:' + this.get('len'), function(e){
       this.set('status', 'end');
       var time = this.get('time');
-      this.log.push('[Origin end] spend time: ' + (time[1] - time[0]) + 'ms');
+      this.log.push({
+        msg: '[Origin end] spend time: ' + (time[1] - time[0]) + 'ms',
+        type: 'end'
+      });
 
       this.fire('end');
     });
@@ -167,10 +179,16 @@ stdclass.extend(Origin, stdclass, {
   _loadHook: function loadHook(name){
     var hookRun = require('./' + name);
     var len = this.get('len');
-    var files = this.get('files');
+    var received = this.get('received');
+    var _files = this.get('_files');
+    var files = (_files[0] || this.get('files')).map(function(file){
+      return received[file] ? false : file;
+    });
+
     var hook = new hookRun({
       path: this.get('path'), 
-      files: files.slice()
+      files: files,
+      maps: this.get('maps')
     });
 
     if (hook.CONSIT['request']){
@@ -189,19 +207,44 @@ stdclass.extend(Origin, stdclass, {
     }, this);
 
     hook.on('end', function(e){
-      this.log.push('[Hook ' + name + '] Get file ' + files[e.index] + 
-        '('+ e.index +'). spend time:' + this._getTime());
+      this.log.push({
+        msg: '[Hook ' + name + '] Get file ' + files[e.index] + 
+        '('+ e.index +'). spend time:' + this._getTime(),
+        type: 'hook',
+        file: files[e.index],
+        hook: name
+      });
       this._endData(e.data, e.index);
     }, this);
 
-    hook.on('running', function(e){
-      var onRuning = this.get('onRuning');
-      onRuning[e] = true;
+    hook.on('receive', function(e){
+      var received = this.get('received');
+      this.log.push({
+        msg: '[Hook ' + name + ' receive] file ' + files[e.index] + 
+        '('+ e.index +'). spend time:' + this._getTime(),
+        type: 'hook',
+        file: files[e.index],
+        hook: name
+      });
+      received[files[e.index]] = true;
+
+    }, this);
+
+    hook.on('reject', function(e){
+      this.log.push({
+        msg: '[Hook ' + name + ' reject] file ' + files[e.index] + 
+        '('+ e.index +'). spend time:' + this._getTime(),
+        type: 'hook',
+        file: files[e.index],
+        hook: name
+      });
     }, this);
 
     hook.on('change:len:' + len, function(){
       var hooks = this.get('hooks');
+      var _files = this.get('_files');
       hooks.shift();
+      _files.shift();
       this.parse();
     }, this);
 
@@ -255,11 +298,20 @@ stdclass.extend(Origin, stdclass, {
 
     if (this.isFinish()) return;
 
+    var received = this.get('received');
     var path = this.get('path');
     var filePath = path + file;
-    var onRuning = this.get('onRuning');
-    //防止文件重复规则
-    if (file && !onRuning[file]) this._steamRead(filePath, i);
+
+    if (file && !received[file]) {
+      this.log.push({
+        msg:'[Origin file receive]: file ' + file + '(' + i +
+        '). Spend time: ' + this._getTime(),
+        type: 'hook',
+        hook: 'origin',
+        file: file
+      });
+      this._steamRead(filePath, i);
+    }
   },
 
   _steamRead: function steamRead(filePath, i){
@@ -277,8 +329,13 @@ stdclass.extend(Origin, stdclass, {
 
     steam.on('end', function(){
       var now = self.get('now');
-      self.log.push('[Origin file]: Get file ' + files[i] + '(' + i + 
-        '). Spend time: ' + self._getTime());
+      self.log.push({
+        msg:'[Origin file]: Get file ' + files[i] + '(' + i +
+        '). Spend time: ' + self._getTime(),
+        type: 'hook',
+        hook: 'origin',
+        file: files[i]
+      });
       self._endData('', i);
     });
 

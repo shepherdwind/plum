@@ -1,12 +1,7 @@
-/**
- * @fileoverview php hook实现 
- * @author hanwen<hanwen.sah@taobao.com>
- */
 'use strict';
-var stdclass = require('../../lib/stdclass');
+var stdclass = require('../lib/stdclass');
 var path = require('path');
 var fs = require('fs');
-var spawn = require('child_process').spawn;
 var exists = fs.exists || path.exists;
 
 function Hook(){
@@ -18,13 +13,12 @@ stdclass.extend(Hook, stdclass, {
  attributes: {
     path: '',
     files: [],
+    maps: {},
     len: 0,
     initialized: true
   },
 
-  CONSIT: {
-    bin: {}
-  },
+  CONSIT: {},
 
   _init: function init(){
     this._bind();
@@ -41,16 +35,14 @@ stdclass.extend(Hook, stdclass, {
     if (!this.get('initialized')) return;
 
     var files = this.get('files');
-    var basePath = this.get('path');
 
     files.forEach(function(file, i){
       if (file === false) return this._add();
-
-      var filePath = basePath + file;
-      exists(filePath, this._do.bind(this, filePath, i));
-
+      var basePath = this.get('path');
+      var maps = this.get('maps');
+      var filePath = maps[file] || basePath + file;
+      exists(filePath, this._do.bind(this, file, filePath, i));
       return null;
-
     }, this);
 
   },
@@ -59,45 +51,39 @@ stdclass.extend(Hook, stdclass, {
     this.set('len', this.get('len') + 1);
   },
 
-  _do: function _do(file, i, exist){
-
+  _do: function _do(file, filePath, i, exist){
     if (!exist){
       //拒绝处理
       this.fire('reject', {file: file, index: i});
-      return this._add();
+      this._add();
+      return;
     }
     //接受处理
     this.fire('receive', {file: file, index: i});
+    this._add();
 
-    var phpCmd = this.get('bin')['php'];
+    this._steamRead(filePath, i);
+  },
 
-    //如果是相对路径
-    if (phpCmd.indexOf('.') > -1){
-      phpCmd = path.resolve(__dirname, path.dirname(phpCmd)) + 
-               '/' + path.basename(phpCmd);
-    }
+  _steamRead: function steamRead(filePath, i){
 
-    var basePath = path.dirname(file);
-
-    var cmd = spawn(phpCmd, [file], {cwd: basePath});
-    var ret = [];
-    var err = [];
+    var steam = fs.createReadStream(filePath);
+    var files = this.get('files');
     var self = this;
+    var ret = [];
 
-    cmd.stdout.on('data', function cmdSuccess(data){
+    steam.on('data', function(data){
       self.fire('data', {data: data, index: i});
     });
 
-    cmd.stderr.on('data', function cmdError(err){
-      self.fire('data', {data: err, index: i});
+    steam.on('end', function(){
+      self.fire('end', {index: i});
     });
 
-    cmd.on('exit', function cmdEnd(){
-      self.fire('end', {data: '', index: i});
-      self._add();
+    steam.on('error', function(err){
+      if (filePath.indexOf('favicon.ico') !== -1) return;
+      console.log('[Error ' + err.code + ']' + err.message);
     });
-
-    return null;
   }
 
 });

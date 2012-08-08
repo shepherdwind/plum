@@ -73,7 +73,13 @@ stdclass.extend(Hook, stdclass, {
     var isBuild = 'build' in url.query;
     var syntax = 'syntax' in url.query;
 
-    if (!exist || !regTms.test(request.url)) return this._add();
+    if (!exist || !regTms.test(request.url)) {
+      //拒绝处理
+      this.fire('reject', {file: file, index: i});
+      return this._add();
+    }
+    //接受处理
+    this.fire('receive', {file: file, index: i});
 
     if (isBuild){
       this.fire('set:header', {type: '.txt'});

@@ -52,7 +52,8 @@ stdclass.extend(Proxy, stdclass, {
     files.forEach(function(file, i){
       if (file !== false){
         var filePath = basePath + file;
-        exists(filePath, this._loadRemote.bind(this, file, i));
+        //exists(filePath, this._loadRemote.bind(this, file, i));
+        this._loadRemote(file, i, false);
       } else {
         this._add();
       }
