@@ -83,6 +83,42 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
 
 ##change log
 
+- [2012-08-12 08:44:24] version 0.3.1
+  - 增加log信息过滤配置，logFiles配置可显示log信息的文件，logHooks配置hook日志,
+    logBasic显示基本信息，显示所有请求文件和请求执行时间. debug所有细节都log到
+    控制台。
+    
+```
+  "logFiles":[
+    {
+      "path":"tmse/5137/assets",
+      "ext":[".css", ".js"]
+    }
+  ],
+  "logHooks":["less"],
+  "logBasic":false,
+  "debug":false
+```
+  - 增加执行时配置，使用[config](http://127.0.0.1/config)进行执行时配置，无需重启
+  服务器。
+  - 修改hook `php/proxy`，使用php5.4启动php内置服务器，请求转发到php自带服务器，
+  支持post，get请求。需要php版本>=5.4
+  - 增加hook `proxyAll`和`statics`，proxyAll对所有请求都从a.tbcdn.cn上取数据，
+  statics为静态文件hook，本来和origin.js和在一起，现在拆分开。
+  - 增加子规则maps配置，用于设置域名下路径映射和hook规则
+   
+```
+  "maps":{
+    "/tmse/5137/assets/":{
+      "path":"/Users/eward/Sites/dev/nongye/sdk/assets/",
+      "hooks":{
+        ".css":["less"],
+        "statics":["statics"]
+      }
+    }
+  }
+```
+
 - [2012-06-12 15:44:03] 
   - 增加`proxy=pre`作为使用预发assets的接口
   - tms规则下，build时，生成文件名对应的html文件，用于fed上预览
