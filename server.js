@@ -7,6 +7,7 @@ var querystring = require('querystring');
 var Origin = require('./hooks/origin');
 var config;
 var servers = {};
+var configStr = '';
 var MIME;
 var existsSync = fs.existsSync || path.existsSync;
 var URL = require('url');
@@ -32,7 +33,7 @@ function init(){
       if (req.method === 'POST') {
         setStatus(req, res, configPath);
       } else if (req.url === '/config') {
-        getStatus(req, res, json);
+        getStatus(req, res, configStr || json);
       } else {
         new Server(req, res);
       }
@@ -413,6 +414,8 @@ function setStatus(req, res, file){
     config.port = config.proxy || 80;
     MIME = config.MIME;
     servers = {};
+    configStr = json;
+
     fs.writeFileSync(file, json);
     getStatus(req, res, json);
   });

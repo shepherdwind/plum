@@ -68,7 +68,8 @@
     ".html":"text/html",
     ".ico":"image/x-icon",
     ".php":"text/html",
-    ".htm":"text/html"
+    ".htm":"text/html",
+    ".less":"text/plain"
   },
   "bin":{
     "php":"php"
@@ -86,11 +87,5 @@
     "less"
   ],
   "logBasic":false,
-  "debug":false,
-  "proxyAll": {
-    "use_pre": false
-  },
-  "less": {
-    "build": false
-  }
+  "debug":false
 }

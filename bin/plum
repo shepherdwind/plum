@@ -31,7 +31,7 @@ fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
   var config = JSON.parse(json);
   console.log('Welcome to Plum v' + config.version + 
     ', server is running.\nPress key ctrl and c to quit!\nconfig url is ' +
-    '120.0.0.1/config');
+    '127.0.0.1/config');
 
   getVersion(function(version){
     if (version > config.version){
