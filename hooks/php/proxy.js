@@ -34,7 +34,8 @@ stdclass.extend(Hook, stdclass, {
   },
 
   CONSIT: {
-    request: {}
+    request: {},
+    data: []
   },
 
   _init: function init(){
@@ -154,6 +155,10 @@ stdclass.extend(Hook, stdclass, {
 
     proxyServer.on('error', function(e){
       console.log('[remote] got failed ' + file);
+    });
+
+    this.get('data').forEach(function(buf){
+      proxyServer.write(buf);
     });
 
     request.on('data', function(chunk) {

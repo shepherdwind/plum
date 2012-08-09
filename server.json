@@ -79,12 +79,22 @@
       "path":"tmse/5137/assets",
       "ext":[
         ".css",
-        ".js"
+        ".js",
+        ".php"
+      ]
+    },
+    {
+      "path":"/nongye/demo",
+      "ext":[
+        ".css",
+        ".js",
+        ".php"
       ]
     }
   ],
   "logHooks":[
-    "less"
+    "less",
+    "php/proxy"
   ],
   "logBasic":false,
   "debug":false

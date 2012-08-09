@@ -30,10 +30,13 @@ function init(){
     MIME = config.MIME;
 
     http.createServer(function createServer(req, res){
-      if (req.method === 'POST') {
-        setStatus(req, res, configPath);
-      } else if (req.url === '/config') {
-        getStatus(req, res, configStr || json);
+
+      if (req.url === '/config') {
+        if (req.method === 'POST') {
+          setStatus(req, res, configPath);
+        } else {
+          getStatus(req, res, configStr || json);
+        }
       } else {
         new Server(req, res);
       }
@@ -77,6 +80,12 @@ Server.prototype = {
   initFiles: function(){
     var req = this.request;
     var res = this.response;
+
+    this.data = [];
+    var self = this;
+    req.on('data', function(chunk) {
+      self.data.push(new Buffer(chunk));
+    });
 
     var host = req.headers.host;
     var serverConfig = this.getServerConfig(host);
@@ -159,6 +168,7 @@ Server.prototype = {
       //引用引起的bug
       hooks: hooks.slice(),
       _files: hooks2Files,
+      data: this.data,
       time: []
     };
     this.hook(cfg);

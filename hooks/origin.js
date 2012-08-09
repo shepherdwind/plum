@@ -191,13 +191,12 @@ stdclass.extend(Origin, stdclass, {
       maps: this.get('maps')
     });
 
-    if (hook.CONSIT['request']){
-      hook.set('request', this.get('request'));
-    }
+    var dataList = ['request', 'bin', 'data'];
+    dataList.forEach(function(name){
+      if (hook.CONSIT[name])
+        hook.set(name, this.get(name));
+    }, this);
 
-    if (hook.CONSIT['bin']){
-      hook.set('bin', this.get('bin'));
-    }
     hook.on('set:header', function(e){
       this.fire('set:header', e);
     }, this);
