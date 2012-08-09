@@ -83,7 +83,7 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
 
 ##change log
 
-- [2012-08-12 08:44:24] version 0.3.1
+- [2012-08-09 08:44:24] version 0.3.1
   - 增加log信息过滤配置，logFiles配置可显示log信息的文件，logHooks配置hook日志,
     logBasic显示基本信息，显示所有请求文件和请求执行时间. debug所有细节都log到
     控制台。
