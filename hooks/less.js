@@ -71,7 +71,8 @@ stdclass.extend(LessHook, stdclass, {
     var request = this.get('request');
     var referer = request.headers['referer'];
     var isWriteFile = false;
-    if (referer && referer.indexOf('?less') > 0){
+    var isBuildLess = /[\?&](less$)|(less&)/;
+    if (referer && isBuildLess.test(referer) > 0){
       isWriteFile = true;
     }
 

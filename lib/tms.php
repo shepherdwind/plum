@@ -28,11 +28,18 @@ if ($isSyntax){
 function repeatReplace ($file) 
 {
     global $isBuild, $jsonData, $json_file, $createFile, $html_file;
-    $phpContent = tms_include($file);
+    $phpContent = file_get_contents($file);
+    $part = tms_handle_header_foot($phpContent);
+    $build = $part['build'];
+    $content = $part['content'];
+    $run =  $part['run'];
+    $content = tms_include($content, $file);
+    $phpContent = $run[0] . $content . $run[1];;
 
     if ($isBuild)
     {
-        echo tms_handle_header_foot($phpContent);
+        $phpContentBuild = $build[0] . $content . $build[1];;
+        echo $phpContentBuild;
         ob_start();
         $phpContent = preg_replace('/_tms_repeat_begin\((?:.+?)row["\']\s*\:\s*[\'"]([^\'"]+)[\'"]?(?:[^\)]+)\)\s*\;?/',"for (\$_i_tms = 0; \$_i_tms < $1; \$_i_tms++) {", $phpContent);
         $phpContent = preg_replace('/_tms_repeat_end\(\s*\)\;?/i','}',$phpContent);
@@ -88,21 +95,26 @@ function tms_handle_header_foot($str)
     $footStart = strpos($str, $commentStart . $foot);
     $footEnd   = strpos($str, $foot . $commentEnd);
 
+    $startTms = substr($str, 0, $headStart);
     $start = substr($str, $headStart + $headLen, $headEnd - $headStart - $headLen);
     $end   = substr($str, $footStart + $footLen, $footEnd - $footStart - $footLen);
+    $endTms   = substr($str, $footEnd + $footLen);
     $mid   = substr($str, $headEnd + $headLen - 1, $footStart - $headEnd - $headLen + 1);
-    return '<?php ' . $start . '?>' . $mid . '<?php ' . $end . '?>';
+    return array(
+        'run' => array($startTms, $endTms),
+        'build'   => array('<?php ' . $start . '?>' , '<?php ' . $end . '?>'),
+        'content' => $mid
+    );
 
 }
 /**
  * 处理依赖关系include
  */
-function tms_include($file)
+function tms_include($str, $file)
 {
     $dir = dirname($file);
-    $str = file_get_contents($file);
     $strs = explode('?>', $str);
-    $reg = '/(?:include|include_once|require|require_once)\s[\'"]([\w\.-_]+\.(?:php|css|js))\?inc[\'"];?/';
+    $reg = '/(?:include|include_once|require|require_once)\s[\'"]([\w\.-_]+\.(?:php|css|js))[\'"];?/';
 
     $ret = '';
 
@@ -238,9 +250,9 @@ function indent($json) {
         // Are we inside a quoted string?
         if ($char == '"' && $prevChar != '\\') {
             $outOfQuotes = !$outOfQuotes;
-        
-        // If this character is the end of an element, 
-        // output a new line and indent the next line.
+
+            // If this character is the end of an element, 
+            // output a new line and indent the next line.
         } else if(($char == '}' || $char == ']') && $outOfQuotes) {
             $result .= $newLine;
             $pos --;
@@ -248,7 +260,7 @@ function indent($json) {
                 $result .= $indentStr;
             }
         }
-        
+
         // Add the character to the result string.
         $result .= $char;
 
@@ -259,12 +271,12 @@ function indent($json) {
             if ($char == '{' || $char == '[') {
                 $pos ++;
             }
-            
+
             for ($j = 0; $j < $pos; $j++) {
                 $result .= $indentStr;
             }
         }
-        
+
         $prevChar = $char;
     }
 
