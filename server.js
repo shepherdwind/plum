@@ -11,6 +11,7 @@ var configStr = '';
 var MIME;
 var existsSync = fs.existsSync || path.existsSync;
 var URL = require('url');
+var cjson = require('./lib/cjson');
 
 function init(){
   /**
@@ -25,10 +26,9 @@ function init(){
 
     if (err) console.log(err);
 
-    config = JSON.parse(json);
+    config = cjson.parse(json);
     config.port = config.proxy || 80;
-    MIME = config.MIME;
-
+    MIME = JSON.parse(fs.readFileSync(__dirname + '/mime.json'));
     http.createServer(function createServer(req, res){
 
       if (req.url === '/config') {
@@ -88,7 +88,8 @@ Server.prototype = {
     });
 
     var host = req.headers.host;
-    var serverConfig = this.getServerConfig(host);
+    var refer = req.headers.referer;
+    var serverConfig = this.getServerConfig(host, refer);
     var url = URL.parse(req.url).path;
     var files = this.parse(url);
     var ext = path.extname(files[0]);
@@ -100,13 +101,11 @@ Server.prototype = {
 
     //console.log(req.headers);
     if (!serverConfig){
-      if (config.debug){
-        console.log('[Error], ' + host + ' is not defined in the config.json');
-        this.error({
-          type: '505',
-          message: '[Error], host ' + host + ' is not defined in the config.json'
-        });
-      }
+      console.log('[Error], ' + host + ' is not defined in the config.json');
+      this.error({
+        type: '505',
+        message: '[Error], host ' + host + ' is not defined in the config.json'
+      });
       return;
     }
 
@@ -156,7 +155,11 @@ Server.prototype = {
       hooks = hooks.concat(serverConfig['hooks'][ext] || []);
 
     } catch(e){
-      throw new Error(e);
+      console.log(e);
+      this.error({
+        type: '505',
+        message: '[Error]'
+      });
     }
 
     var cfg = {
@@ -296,10 +299,17 @@ Server.prototype = {
   /**
    * 合并equal并且，支持group配置
    */
-  getServerConfig: function(server){
+  getServerConfig: function(server, refer){
 
     var cfg = config['servers'][server];
-    if (!cfg) return false;
+    if (!cfg) {
+      if (refer && refer == 'http://127.0.0.1/config') {
+        cfg = {path: path.resolve(__dirname, './gui/')};
+      } else { 
+        cfg = {path: config['www']};
+      }
+      config['servers'][server] = cfg;
+    }
 
     //处理equal关系
     if (!cfg.path && cfg.equal){
@@ -403,10 +413,11 @@ Server.prototype = {
 
 };
 
-function getStatus(req, res, json) {//{{{
+function getStatus(req, res, json, message) {//{{{
   res.writeHead(200, {'Content-Type': 'text/html'});
   var html = fs.readFileSync(__dirname + '/gui/config.html').toString();
   html = html.replace('{{config}}', json);
+  html = html.replace('{{message}}', message || '');
   res.end(html);
 }//}}}
 
@@ -418,16 +429,21 @@ function setStatus(req, res, file){
   });
   req.on('end', function (data) {
     formData = querystring.parse(formData);
-    var json = formatJson(formData.config.trim());
+    var json = formData.code.trim();
+    var message = '配置成功';
 
-    config = JSON.parse(json);
-    config.port = config.proxy || 80;
-    MIME = config.MIME;
-    servers = {};
-    configStr = json;
+    try {
+      config = cjson.parse(json);
+      config.port = config.proxy || 80;
+      servers = {};
+      configStr = json;
+      fs.writeFileSync(file, json);
+    } catch (e){
+      console.log(e);
+      message = "配置失败:" + e.toString();
+    }
 
-    fs.writeFileSync(file, json);
-    getStatus(req, res, json);
+    getStatus(req, res, json, message);
   });
 }
 

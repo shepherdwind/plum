@@ -1,47 +1,49 @@
 {
-  "port":80,
-  "dirIndex":[
-    "index.html",
-    "index.htm"
-  ],
-  "www":"/Users/eward/Sites/",
-  "groups":{
-    "statics":[
-      ".css",
-      ".js",
-      "imgs",
-      ".swf"
-    ],
-    "imgs":[
-      ".png",
-      ".gif",
-      ".jpg",
-      ".ico"
-    ]
+  /**
+   * 服务器配置，全局配置，www根目录
+   */
+  "port"     : 80,
+  "dirIndex" : ["index.html", "index.php"],
+  "www"      : "/Users/eward/Sites/",
+
+  /**
+   * 全局钩子
+   */
+  "hooks":{
+    ".css":["less"],
+    ".php":["php/tms", "php/proxy"]
   },
+
+  /**
+   * 文件分组，根据文件后缀分组
+   */
+  "groups":{
+    "statics" : [".css",".js","imgs",".swf"],
+    "imgs"    : [".png", ".gif", ".jpg", ".ico"]
+  },
+
+  /**
+   * 单个服务器配置
+   */
   "servers":{
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
+      //目录映射，使用反斜杠，并且目录最后加上反斜杠
       "maps":{
         "/tmse/5137/assets/":{
-          "path":"/Users/eward/Sites/dev/nongye/sdk/assets/",
+          "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
           "hooks":{
-            ".css":[
-              "less"
-            ],
-            "statics":[
-              "statics"
-            ]
+            ".css"    : ["less"],
+            "statics" : ["statics"]
           }
         }
       },
       "hooks":{
-        "statics":[
-          "proxyAll"
-        ]
+        "statics":["proxyAll"]
       }
     },
     "assets.daily.taobao.net":{
+      //equal 与服务器配置相同
       "equal":"a.tbcdn.cn"
     },
     "market":{
@@ -51,49 +53,29 @@
       "path":"/Users/eward/Sites/TSDK/"
     }
   },
-  "hooks":{
-    ".css":[
-      "statics"
-    ],
-    ".php":[
-      "php/tms",
-      "php/proxy"
-    ]
-  },
-  "MIME":{
-    ".js":"application/x-javascript",
-    ".css":"text/css",
-    ".txt":"text/plain",
-    ".png":"image/png",
-    ".gif":"image/gif",
-    ".jpg":"image/jpeg",
-    ".swf":"application/x-shockwave-flash",
-    ".html":"text/html",
-    ".ico":"image/x-icon",
-    ".php":"text/html",
-    ".htm":"text/html",
-    ".less":"text/plain"
-  },
-  "bin":{
-    "php":"php"
-  },
+
+  //php执行路径，默认在如果在$PATH中有php命名，否则使用相对路径
+  "bin":{"php":"php"},
+
+  /**
+   * log控制台输出信息控制
+   */
+  //允许输出console.log信息的文件规则，文件路径满足，并且文件类型在ext数组中的
+  //将会输出到终端中
   "logFiles":[
     {
       "path":"tmse/5137/assets",
-      "ext":[
-        ".css"
-      ]
+      "ext":[".js", ".css"]
     },
     {
       "path":"/nongye/",
-      "ext":[
-        ".css"
-      ]
+      "ext":[".css"]
     }
   ],
-  "logHooks":[
-    "less"
-  ],
-  "logBasic":false,
-  "debug":false
+  //允许输出的hook
+  "logHooks" : ["less"],
+  //输出请求基本信息，包括请求文件数和总时间
+  "logBasic" : false,
+  //输出所有log信息
+  "debug"    : false
 }
