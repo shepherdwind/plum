@@ -42,7 +42,7 @@ fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
     }
   });
 
-  server();
+  server(config.version);
 });
 /**
  * vim: ft=javascript:tw=80:

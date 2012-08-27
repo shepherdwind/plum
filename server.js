@@ -13,7 +13,7 @@ var existsSync = fs.existsSync || path.existsSync;
 var URL = require('url');
 var cjson = require('./lib/cjson');
 
-function init(){
+function init(version){
   /**
    * 入口，读取配置文件
    */
@@ -33,9 +33,9 @@ function init(){
 
       if (req.url === '/config') {
         if (req.method === 'POST') {
-          setStatus(req, res, configPath);
+          setStatus(req, res, configPath, version);
         } else {
-          getStatus(req, res, configStr || json);
+          getStatus(req, res, configStr || json, '', version);
         }
       } else {
         new Server(req, res);
@@ -413,15 +413,16 @@ Server.prototype = {
 
 };
 
-function getStatus(req, res, json, message) {//{{{
+function getStatus(req, res, json, message, version) {//{{{
   res.writeHead(200, {'Content-Type': 'text/html'});
   var html = fs.readFileSync(__dirname + '/gui/config.html').toString();
   html = html.replace('{{config}}', json);
+  html = html.replace('{{version}}', version);
   html = html.replace('{{message}}', message || '');
   res.end(html);
 }//}}}
 
-function setStatus(req, res, file){
+function setStatus(req, res, file, version){
   req.setEncoding('utf8');
   var formData = '';
   req.on('data', function (data) {
@@ -443,7 +444,7 @@ function setStatus(req, res, file){
       message = "配置失败:" + e.toString();
     }
 
-    getStatus(req, res, json, message);
+    getStatus(req, res, json, message, version);
   });
 }
 
