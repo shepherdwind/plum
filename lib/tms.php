@@ -157,11 +157,31 @@ function tms_include($str, $file)
 function _tms_common ( $args, $attributes = '') {
     global $jsonData, $createFile;
     $json = json_decode(iconv('gbk', 'utf-8', $args), true);
-    if (count($jsonData) AND array_key_exists($json['name'], $jsonData)) {
-        return $jsonData[$json['name']];
+    $name = $json['name'];
+    $data = tms_common($args , $attributes);
+    if (count($jsonData) AND array_key_exists($name, $jsonData)) {
+        $ret = $jsonData[$name];
+        foreach ($data as $k => $v)
+        {
+            $_item = $ret[$k];
+            $ret[$k] = array();
+            foreach ($v as $key => $value)
+            {
+                if (array_key_exists($key, $_item))
+                {
+                    $ret[$k][$key] = $_item[$key];
+                } 
+                else
+                {
+                    $ret[$k][$key] = $value;
+                    $createFile = true;
+                }
+            }
+        }
+        $jsonData[$name] = $ret;
+        return $jsonData[$name];
     } else {
-        $data = tms_common($args , $attributes);
-        $jsonData[$json['name']] = $data;
+        $jsonData[$name] = $data;
         $createFile = true;
         return $data;
     }
