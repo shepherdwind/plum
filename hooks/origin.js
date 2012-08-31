@@ -1,4 +1,5 @@
 var stdclass = require('../lib/stdclass');
+var log = require('../lib/logger').log;
 var path = require('path');
 var fs = require('fs');
 
@@ -69,8 +70,8 @@ stdclass.extend(Origin, stdclass, {
 
     this._recodeTime();
     this.log.push({
-      msg: '[Origin begin]:' + this.get('len') + 
-      ' files(' + this.get('files').map(path.basename) + ')', 
+      log: 'Origin begin',
+      msg: this.get('len') + ' files(' + this.get('files').map(path.basename) + ')', 
       type: 'begin'
     });
 
@@ -85,7 +86,8 @@ stdclass.extend(Origin, stdclass, {
       this.set('status', 'end');
       var time = this.get('time');
       this.log.push({
-        msg: '[Origin end] spend time: ' + (time[1] - time[0]) + 'ms',
+        log: 'Origin end',
+        msg: 'spend time: ' + (time[1] - time[0]) + 'ms',
         type: 'end'
       });
 
@@ -132,8 +134,9 @@ stdclass.extend(Origin, stdclass, {
       this._loadHook(hooks[0]);
     } else {
       if (ext && !MIME[ext]){
-        this.fire('err', {'message': ERROR_TYPE[415] + ext, type: "415"});
-        return;
+        log('undefined mime type', 'warn', ext);
+        //this.fire('err', {'message': ERROR_TYPE[415] + ext, type: "415"});
+        //return;
       }
 
       ext ? this.set('status', 'initialized'): this._listDir();
@@ -207,8 +210,8 @@ stdclass.extend(Origin, stdclass, {
 
     hook.on('end', function(e){
       this.log.push({
-        msg: '[Hook ' + name + '] Get file ' + files[e.index] + 
-        '('+ e.index +'). spend time:' + this._getTime(),
+        log: 'Hook ' + name,
+        msg: 'Get file ' + files[e.index] + '('+ e.index +'). spend time:' + this._getTime(),
         type: 'hook',
         file: files[e.index],
         hook: name
@@ -219,8 +222,8 @@ stdclass.extend(Origin, stdclass, {
     hook.on('receive', function(e){
       var received = this.get('received');
       this.log.push({
-        msg: '[Hook ' + name + ' receive] file ' + files[e.index] + 
-        '('+ e.index +'). spend time:' + this._getTime(),
+        log: 'Hook ' + name + ' receive',
+        msg:  'file ' + files[e.index] + '('+ e.index +'). spend time:' + this._getTime(),
         type: 'hook',
         file: files[e.index],
         hook: name
@@ -231,7 +234,8 @@ stdclass.extend(Origin, stdclass, {
 
     hook.on('reject', function(e){
       this.log.push({
-        msg: '[Hook ' + name + ' reject] file ' + files[e.index] + 
+        log: 'Hook ' + name + ' reject',
+        msg: 'file ' + files[e.index] + 
         '('+ e.index +'). spend time:' + this._getTime(),
         type: 'hook',
         file: files[e.index],
@@ -261,6 +265,7 @@ stdclass.extend(Origin, stdclass, {
     var self = this;
 
     fs.readdir(dir, function readdir(err, files){
+      self.fire('set:header', {type: '.html'});
       if (err){
         self.fire('err', {message: ERROR_TYPE[500], type: 500});
         return;
@@ -272,7 +277,11 @@ stdclass.extend(Origin, stdclass, {
         if (!ext) name = name + '/';
         html += '<li><a href="' + name + '">' + name + "\n";
       });
-      self.log.push('[Origin dir]: List dir ' + dir);
+      self.log.push({
+        type: 'dir',
+        msg: 'List dir ' + dir,
+        log: 'Origin dir'
+      });
       self._endData(html);
     });
   },
@@ -303,8 +312,8 @@ stdclass.extend(Origin, stdclass, {
 
     if (file && !received[file]) {
       this.log.push({
-        msg:'[Origin file receive]: file ' + file + '(' + i +
-        '). Spend time: ' + this._getTime(),
+        msg:'file ' + file + '(' + i + '). Spend time: ' + this._getTime(),
+        log: 'Origin file receive',
         type: 'hook',
         hook: 'origin',
         file: file
@@ -329,8 +338,8 @@ stdclass.extend(Origin, stdclass, {
     steam.on('end', function(){
       var now = self.get('now');
       self.log.push({
-        msg:'[Origin file]: Get file ' + files[i] + '(' + i +
-        '). Spend time: ' + self._getTime(),
+        msg:'Get file ' + files[i] + '(' + i + '). Spend time: ' + self._getTime(),
+        log: 'Origin file',
         type: 'hook',
         hook: 'origin',
         file: files[i]
@@ -340,7 +349,7 @@ stdclass.extend(Origin, stdclass, {
 
     steam.on('error', function(err){
       if (filePath.indexOf('favicon.ico') !== -1) return;
-      console.log('[Error ' + err.code + ']' + err.message);
+      log('Error ' + err.code + '', 'error', err.message);
       var errObj = {message: err.message, file: filePath, index: i, type: 500};
       if (err.errno == 34){
         errObj.message = ERROR_TYPE[404];

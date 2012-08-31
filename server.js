@@ -1,17 +1,18 @@
 'use strict';
 
-var fs = require('fs');
-var http = require('http');
-var path = require('path');
+var fs          = require('fs');
+var http        = require('http');
+var path        = require('path');
 var querystring = require('querystring');
-var Origin = require('./hooks/origin');
+var Origin      = require('./hooks/origin');
+var servers     = {};
+var configStr   = '';
+var existsSync  = fs.existsSync || path.existsSync;
+var URL         = require('url');
+var cjson       = require('./lib/cjson');
+var log         = require('./lib/logger').log;
 var config;
-var servers = {};
-var configStr = '';
 var MIME;
-var existsSync = fs.existsSync || path.existsSync;
-var URL = require('url');
-var cjson = require('./lib/cjson');
 
 function init(version){
   /**
@@ -24,7 +25,7 @@ function init(version){
 
   fs.readFile(configPath, 'utf-8', function(err, json){
 
-    if (err) console.log(err);
+    if (err) log('error', 'error', err);
 
     config = cjson.parse(json);
     config.port = config.proxy || 80;
@@ -101,7 +102,7 @@ Server.prototype = {
 
     //console.log(req.headers);
     if (!serverConfig){
-      console.log('[Error], ' + host + ' is not defined in the config.json');
+      log('error', 'error', host + ' is not defined in the config.json');
       this.error({
         type: '505',
         message: '[Error], host ' + host + ' is not defined in the config.json'
@@ -123,9 +124,33 @@ Server.prototype = {
       !index ? (ext = '') : (files[0] = fileName);
     }
 
+    var maps = this._getMaps(serverConfig, files, ext);
+    var mapPath = maps.mapPath;
+    var hooks = maps.hooks;
+    var hooks2Files = maps._files;
+
+    var cfg = {
+      path: basePath,
+      maps: mapPath,
+      files: files,
+      len: files.length,
+      ext: ext,
+      //引用引起的bug
+      hooks: hooks.slice(),
+      _files: hooks2Files,
+      data: this.data,
+      time: []
+    };
+    this.hook(cfg);
+
+    var type = this.get('type');
+    type = MIME[ext] || MIME['.txt'];
+    this.set('type', type);
+  },
+
+  _getMaps: function(serverConfig, files, ext){
     try {
       var hooks = [];
-      //var hooks = serverConfig['hooks'][ext] || [];
       var hooks2Files = [];
       var maps = serverConfig.maps || {};
       var mapPath = {};
@@ -155,30 +180,17 @@ Server.prototype = {
       hooks = hooks.concat(serverConfig['hooks'][ext] || []);
 
     } catch(e){
-      console.log(e);
+      log('[Error]', e);
       this.error({
         type: '505',
         message: '[Error]'
       });
     }
-
-    var cfg = {
-      path: basePath,
-      maps: mapPath,
-      files: files,
-      len: files.length,
-      ext: ext,
-      //引用引起的bug
-      hooks: hooks.slice(),
-      _files: hooks2Files,
-      data: this.data,
-      time: []
+    return {
+      mapPath: mapPath,
+      hooks: hooks,
+      _files: hooks2Files
     };
-    this.hook(cfg);
-
-    var type = this.get('type');
-    type = MIME[ext] || MIME['.html'];
-    this.set('type', type);
   },
 
   mixin: function(cfg){
@@ -226,7 +238,11 @@ Server.prototype = {
       //超过20ms的信息log出来
       //if (hook.getSpendTime() > 20){
       hook.log.forEach(function(msg){
-        if (_this._shouldShow(msg)) console.log(msg.msg);
+        if (_this._shouldShow(msg)) {
+          var level = 'info';
+          if (msg.log.indexOf('reject') > -1) level = 'debug';
+          log(msg.log, level, msg.msg || '');
+        }
       });
       //}
     });
@@ -269,7 +285,7 @@ Server.prototype = {
   error: function (e){
     var response = this.response;
     var file = e.file || '';
-    console.log('[Error ' + e.type + ']: ' + file);
+    log('Error ' + e.type, 'error', file || e.message);
     response.writeHead(e.type, {
       'Content-Type': MIME['.html'],
       'Server': 'Node'
@@ -440,7 +456,7 @@ function setStatus(req, res, file, version){
       configStr = json;
       fs.writeFileSync(file, json);
     } catch (e){
-      console.log(e);
+      log('error', 'error', e);
       message = "配置失败:" + e.toString();
     }
 

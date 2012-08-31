@@ -38,7 +38,7 @@ fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
       setInterval(function(){
         console.log( red + 
           'the newest version is ' + version + ', pleace update !!' + reset);
-      }, 10000)
+      }, 100000)
     }
   });
 

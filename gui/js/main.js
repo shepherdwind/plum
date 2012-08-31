@@ -73,4 +73,15 @@
     document.getElementById('J_msg').className = 'hidden';
   }, 5000);
 
+  var commands = editor.commands;
+  commands.addCommand({
+    name: "save",
+    bindKey: {win: "Ctrl-S", mac: "Command-S"},
+    exec: function(){
+      form['code'].value = editor.getValue();
+      form.submit();
+    }
+  });
+
+
 })();

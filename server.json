@@ -3,17 +3,20 @@
   "dirIndex" : ["index.html", "index.htm"],
   "www"      : "/Users/eward/Sites/",
 
-  "hooks":{
-    ".css":["less"],
-    ".php":["php/tms", "php/proxy"]
-  },
-
   "groups":{
     "statics" : [".css",".js","imgs",".swf"],
     "imgs"    : [".png", ".gif", ".jpg", ".ico"]
   },
 
+  "hooks":{
+    ".css":["less"],
+    ".php":["php/tms", "php/proxy"]
+  },
+  
   "servers":{
+     "market":{
+      "path":"/Users/eward/Sites/dev/"
+    },
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
       "maps":{
@@ -23,6 +26,13 @@
             ".css"    : ["statics"],
             "statics" : ["statics"]
           }
+        },
+        "/p/market/nongye/": {
+            "path": "/Users/eward/deploy/market/nongye/",
+            "hooks": {
+                ".css"    : ["less"],
+                "statics" : ["statics"]
+            }
         }
       },
       "hooks":{
@@ -32,9 +42,7 @@
     "assets.daily.taobao.net":{
       "equal":"a.tbcdn.cn"
     },
-    "market":{
-      "path":"/Users/eward/Sites/dev/"
-    },
+
     "sdk":{
       "path":"/Users/eward/Sites/TSDK/"
     }
@@ -52,7 +60,7 @@
       "ext":[".css"]
     }
   ],
-  "logHooks" : ["less"],
+  "logHooks" : ["less", "statics"],
   "logBasic" : false,
   "debug"    : false
 }

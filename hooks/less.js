@@ -1,4 +1,5 @@
 var stdclass = require('../lib/stdclass');
+var log = require('../lib/logger').log;
 var path = require('path');
 var fs = require('fs');
 var less = require('less');
@@ -143,20 +144,19 @@ stdclass.extend(LessHook, stdclass, {
             if (isWriteFile){
               fs.writeFile(filePath.replace('.less', '.css'), data, function (err) {
                 if (err) {
-                  console.log(err);
+                  log('less write error','error', err);
                 } else {
-                  console.log('[Less build] success ' + file);
+                  log('Less build', 'info', 'success ' + file);
                 }
               });
             }
 
           } catch(e){
-            console.log(e.message);
-            console.log('[Error] lessc error on file ' + file);
+            log('less error', 'error', e.message + ', on file ' + file + ' at line ' + e.line);
           }
 
           if (err) {
-            console.log(err.message);
+            log('less parser error', 'error', err.message + ', on file ' + err.filename);
             data = err.message + ", on file " + file;
           }
 

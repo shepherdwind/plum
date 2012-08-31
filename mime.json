@@ -1,14 +1,14 @@
 {
-  ".js":"application/x-javascript",
-  ".css":"text/css",
-  ".txt":"text/plain",
-  ".png":"image/png",
-  ".gif":"image/gif",
-  ".jpg":"image/jpeg",
-  ".swf":"application/x-shockwave-flash",
-  ".html":"text/html",
-  ".ico":"image/x-icon",
-  ".php":"text/html",
-  ".htm":"text/html",
-  ".less":"text/plain"
+  ".js"   : "application/x-javascript",
+  ".json" : "application/json",
+  ".css"  : "text/css",
+  ".png"  : "image/png",
+  ".gif"  : "image/gif",
+  ".jpg"  : "image/jpeg",
+  ".ico"  : "image/x-icon",
+  ".swf"  : "application/x-shockwave-flash",
+  ".html" : "text/html",
+  ".php"  : "text/html",
+  ".htm"  : "text/html",
+  ".txt"  : "text/plain"
 }
