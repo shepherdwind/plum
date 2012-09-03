@@ -1,7 +1,8 @@
 (function (){
   var editor = ace.edit("code");
   editor.getSession().setMode("ace/mode/json");
-  editor.setHighlightActiveLine(false);
+  editor.setTheme('ace/theme/merbivore');
+  //editor.setHighlightActiveLine(false);
   var modeEl = document.getElementById("mode");
   var themeEl = document.getElementById("theme");
   var vim = require("ace/keyboard/vim").handler;

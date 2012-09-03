@@ -18,30 +18,6 @@
 - *dirIndex*: 目录中默认查找文件
 - *servers*: 虚拟主机相关配置，包括域名对应的base路径和特定hooks
 - *hooks*: 全局hook，比如.php: php，所有的php文件都会通过`hooks/php.js`执行
-- *MIME*: 需要支持的文件类型
-
-        {
-          "port": 80,
-            "dirIndex": ["index.html", ..],
-            "servers": {
-              "a.tbcdn.cn": {
-                "path": "/Users/eward/assets",
-                "hooks": {
-                  ".css": ["proxy"], 
-                  ...
-                }
-              },
-              ...
-            },
-            "hooks": {
-              ".php" : ["php"],
-              ".css" : ["less"]
-            },
-            "MIME": {
-              ".js": "application/x-javascript",
-              ...
-            }
-        }
 
 ##hooks
 

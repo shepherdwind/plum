@@ -23,14 +23,12 @@
         "/tmse/5137/assets/":{
           "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
           "hooks":{
-            ".css"    : ["statics"],
             "statics" : ["statics"]
           }
         },
         "/p/market/nongye/": {
             "path": "/Users/eward/deploy/market/nongye/",
             "hooks": {
-                ".css"    : ["less"],
                 "statics" : ["statics"]
             }
         }
@@ -62,5 +60,5 @@
   ],
   "logHooks" : ["less", "statics"],
   "logBasic" : false,
-  "debug"    : false
+  "debug"    : true
 }
