@@ -2,156 +2,416 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Plum by shepherdwind</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="./style/default.css" />
+    <link rel="stylesheet" type="text/css" href="./style/article.css" />
+    <link rel="stylesheet" type="text/css" href="./style/joycss.css" />
+    <title>Plum文档</title>
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Plum</h1>
-        <p>Demo server environment by node</p>
-
-        <p class="view"><a href="https://github.com/shepherdwind/plum">View the Project on GitHub <small>shepherdwind/plum</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/shepherdwind/plum/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/shepherdwind/plum/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/shepherdwind/plum">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>Plum</h1>
-
-<p>基于node的Demo服务器。Node作为http请求控制中心，通过<code>server.json</code>配置，根据请求
-域名，找到所请求的文件，同时根据服务器配置的<code>hook</code>，对文件执行解析分发。</p>
-
-<h2>Use</h2>
-
-<pre><code>  sudo npm install plum -g
-  sudo plum
-</code></pre>
-
-<p>依赖php cli和node的less模块，请首先安装。</p>
-
-<h2>config</h2>
-
-<p>配置文件: <code>server.json</code>。配置方式和Apache基本一直，不过没有那么复杂。</p>
-
-<ul>
-<li>
-<em>port</em>: 端口，默认80</li>
-<li>
-<em>dirIndex</em>: 目录中默认查找文件</li>
-<li>
-<em>servers</em>: 虚拟主机相关配置，包括域名对应的base路径和特定hooks</li>
-<li>
-<em>hooks</em>: 全局hook，比如.php: php，所有的php文件都会通过<code>hooks/php.js</code>执行</li>
-<li>
-<p><em>MIME</em>: 需要支持的文件类型</p>
-
-<pre><code>{
-  "port": 80,
-    "dirIndex": ["index.html", ..],
-    "servers": {
-      "a.tbcdn.cn": {
-        "path": "/Users/eward/assets",
-        "hooks": {
-          ".css": ["proxy"], 
-          ...
-        }
-      },
-      ...
-    },
-    "hooks": {
-      ".php" : ["php"],
-      ".css" : ["less"]
-    },
-    "MIME": {
-      ".js": "application/x-javascript",
-      ...
-    }
-}
-</code></pre>
-</li>
-</ul><h2>hooks</h2>
-
-<p><a href="https://github.com/shepherdwind/plum/blob/master/hooks/README.md">文档</a>。
-server.js是入口文件，完成请求分发工作。主要解析过程由hooks目录下的js执行。</p>
-
-<ul>
-<li>
-<p><em>origin</em></p>
-
-<p>origin首先判断请求为文件还是目录，如果是目录，生成目录列表。如果是文件，根据文
-件后缀，初始化相对于的hook，并且接受hook发送数据请求事件。控制文件输出到客户端
-的属性，和错误情况的处理。同时，在没有hook的情况下，完成静态文件读取的功能。</p>
-</li>
-<li>
-<p><em>hook*和*hook-simple</em></p>
-
-<p>这两个是hook规范事例，并没有具体实现，是扩展hook的规范</p>
-</li>
-<li>
-<p><em>less</em></p>
-
-<p>less完成less解析工作，初始化时，判断文件相对应的less文件是否存在，如果存在执行
-less编译，返回结果，如果不存在，退出，交给origin处理。</p>
-</li>
-<li>
-<p><em>proxy</em></p>
-
-<p>淘宝cdn代理实现。初始化时候，首先判断文件在本地是否存在(文件查找规则由请求url
-和 server.json配置的path决定)，如果不存在，从cdn服务器获取数据。如果存在，则退
-出，origin处理自动。</p>
-</li>
-<li>
-<p><em>php/cli</em></p>
-
-<p>通过php cli解析php文件，现在还不支持post和get请求，作为demo环境基本够用，执行
-效率和由php 自身性能决定，和转发者是node还是apache无关。</p>
-</li>
-<li>
-<p><em>php/tms</em></p>
-
-<p>模拟tms函数，生成demo。判断规则是：文件是php，并且含有.tms，tms规则支持tms文件
-引用，不过要求，每次只引用一个文件(<code>&lt;?php include 'a.tms.php';?&gt;</code>)，而且文件名
-中含有.tms。demo的数据根据请求的文件名，把后缀改为json，比如访问a.tms.php，demo
-数据源为a.tms.json，运行时，每个函数通过name来定位数据。</p>
-</li>
-</ul><h2>change log</h2>
-
-<ul>
-<li>[2012-06-12 15:44:03] 
-
-<ul>
-<li>增加<code>proxy=pre</code>作为使用预发assets的接口</li>
-<li>tms规则下，build时，生成文件名对应的html文件，用于fed上预览</li>
-<li>去除tms规则下，引用模块文件名必须以<code>.tms.php</code>结尾的规则</li>
-<li>tms规则下，自动生成.json文件，方便修改</li>
-<li>增加自动更新提示</li>
-</ul>
-</li>
-</ul><h2>TODO</h2>
-
-<ul>
-<li>php使用php-cgi和fpm来执行。对fpm和php-cgi不是很了解，学习中。</li>
-<li>vm模板解析</li>
-</ul>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/shepherdwind">shepherdwind</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+  <div id="ribbon"><a href="https://github.com/shepherdwind/plum">Fork me on GitHub</a></div>
+    <header>
+    <div class="header-wrap">
+      <h2>Plum文档</h2>
+      <ul class="main-nav">
+        <li><span class="home">Home</span></li>
+        <li class="blog"><a href="http://shepherdwind.com">Blog</a></li>
+        <li><a href="http://joycss.org">joycss</a></li>
+      </ul>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+    </header>
+    <div class="content">
+      <div class="content-nav" id="J_nav">
+        <div class="box-hd">目录导航
+        </div>
+      </div>
+      <div class="content-main">
+        
+
+<h3 id="toc_0.0.1">简介·about</h3>
+
+<p>
+Plum是使用node搭建服务器，用于本地开发过程中，替代apache。Plum本身是nodejs开发工
+具，可以方便的自行配置服务器解析规则。比如对css进行less解析，对静态文件做cdn代理，
+模板的本地数据模拟。
+</p>
+
+<p>
+<img src="./demo/plum/plum.png" alt="plum" class="close" />
+</p>
+
+<p>
+上图是plum执行的基本过程。
+</p>
+
+<h3 id="toc_0.0.2">规则与组·hook</h3>
+
+<p>
+plum中，规则是都某些文件解析的规则，使用nodejs实现。规则接受一个文件解析请求，如
+果规则接受当前文件解析，则解析并返回数据，如果不接受，退出，交给下一个规则进行解
+析，最终，如果没有任何其他规则接受的请求，都会使用<code>statics</code>规则，原样输出。
+</p>
+
+<p>
+现在支持的规则，一共有如下几种：
+</p>
+
+<ol>
+<li>
+<code>statics</code> 静态文件规则，读取文件，输出内容
+
+<li>
+<code>less</code> 查找less文件，返回编译结果
+
+<li>
+<code>proxy</code> cdn代理规则，和ucool方式一致
+
+<li>
+<code>proxyAll</code> 完全代理模式，所有请求从线上取，和<code>statics</code>或者<code>less</code>规则结合路由
+  map功能，实现局部代理功能
+
+<li>
+<code>php/cli</code> 使用php命令行方式解析php
+
+<li>
+<code>php/proxy</code> 请求转发到php自带服务器，需要php5.4支持
+
+<li>
+<code>php/tms</code> tms规则，在php请求url后面加上参数<code>?tms</code>，使用tms预览模式解析，
+  0.3.6开始支持cms语法
+
+</ol>
+
+<p>
+规则配置和文件后缀关联，比如<code> ".css":["less"] </code>，表示css文件，使用<code>hooks/less</code>解
+析。文件后缀可以设置组规则，比如<code>"statics": ["proxyAll"]</code>，statics定位在配置文件
+顶层group之下：
+</p>
+<pre class="prettyprint linenums lang-json">
+  "groups":{
+    "statics" : [".css",".js","imgs",".swf"],
+    "imgs"    : [".png", ".gif", ".jpg", ".ico"]
+  }
+</pre>
+<p>
+在配置规则时，可以通过自定义组设置，组规则配置可以相互引用，statics组调用了imgs
+组，statics组指代所有的静态文件资源。
+</p>
+
+<p>
+规则配置作用域分三层，第一次全局默认配置，第二层与host关联，第三层和host下面一段
+路径关联。
+</p>
+
+<pre class="prettyprint linenums lang-json">
+"hooks":{
+  ".css":["less"],
+  ".php":["php/tms", "php/proxy"]
+},
+"servers":{
+  "a.tbcdn.cn": {
+    "path":"/Users/eward/assets",
+    "hooks":{
+      "statics":["proxyAll"]
+    },
+    "maps":{
+      "/tmse/5137/assets/":{
+        "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
+        "hooks":{
+          "statics" : ["statics"]
+        }
+      }
+    }
+  }
+}
+</pre>
+
+<p>
+上面的代码中，第1行hooks规则，配置为全局规则配置。第8行，配置为第二层，域名
+a.tbcdn.cn下的规则，第三层为域名之下的某个目录，第14行。作用域层级越高，执行优先
+级越高，三级作用域主要为了处理cdn代理，第二层使用<code>hooks/proxyAll</code>，所有的请求从
+服务器抓取，第三层配置目录映射，当请求为a.tbdcn.cn/tmse/5137/assets/foo.css，请
+求会使用第三层规则。三层配置只在cdn代理需要，其他域名配置基本只需要使用全局配置
+就行。
+</p>
+
+<h3 id="toc_0.0.3">配置·config</h3>
+
+<p>
+配置文件放在plum根目录下，文件名<code>server.json</code>，plum会首先读取根目录外面一个文件
+夹中读取配置，如果不存在，读取plum目录下的配置。为了方便后面的更新，请首先复制
+一份配置文件到plum文件夹同级目录下。
+</p>
+
+<p>
+配置通过<a href="http://127.0.0.1/config">http://127.0.0.1/config</a>进行配置，直接修改配置文件也行。处理上面所说
+的规则配置和文件分组配置外，其他还有配置如下：
+<table>
+<tr>
+<th>
+key
+</th>
+<th>
+defalut
+</th>
+<th>
+mean
+</th>
+</tr>
+<tr>
+<td>
+dirIndex
+</td>
+<td>
+["index.html"]
+</td>
+<td>
+文件夹默认index文件
+</td>
+</tr>
+<tr>
+<td>
+www
+</td>
+<td>
+""
+</td>
+<td>
+web默认目录
+</td>
+</tr>
+<tr>
+<td>
+debug
+</td>
+<td>
+false
+</td>
+<td>
+开启调试模式,输出所有log信息
+</td>
+</tr>
+<tr>
+<td>
+logBasic
+</td>
+<td>
+false
+</td>
+<td>
+开启基本信息输出，输出所有请求基本信息
+</td>
+</tr>
+<tr>
+<td>
+logHooks
+</td>
+<td>
+[]
+</td>
+<td>
+输出特定hook请求信息
+</td>
+</tr>
+<tr>
+<td>
+logFiles
+</td>
+<td>
+[{path: '', ext: []}]
+</td>
+<td>
+根据文件路径和后缀输出log信息
+</td>
+</tr>
+<tr>
+<td>
+bin
+</td>
+<td>
+{php:"php"}
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+</table>
+</p>
+
+<h3 id="toc_0.0.4">cdn代理</h3>
+
+<p>
+在plum中，代理是通过多种规则实现的。和ucool之类的代理不一样的是，plum使用局部代
+理。在ucool中，a.tbcdn.cn指向一个<code>assets</code>文件夹，请求到代理服务器，如果<code>assets</code>
+目录中，有请求的文件，则使用代理，代理服务器中获取。plum在本地开启node服务器，
+<code>proxy</code>规则和ucool实现原理一致。另外一种，更加有好的方式是，局部代理。局部代理，
+只对某一个路径进行本地代理，其他全部从线上取。可以免去为a.tbcnd.cn代理单独设置一
+个目录的工作，比如，项目路径为<code>/apps/a/b/c/d/src/build/2012122/</code>，使用<code>proxy</code>方式，
+需要在<code>assets</code>目录下建立同样长的路径，而且，本地开发时候已经有一个工程assets的目
+录了，这个用于demo开发，使用局部代理，只需要把demo开发中的assets路径和线上assets
+路径配置映射map，还可以省去两个目录同步的工作。
+</p>
+
+<p>
+当代理请求为daily地址时，代理会自动切换到daily服务器取数据。切换到预发，使用的是
+url参数，通过在url请求中增加一个<code>proxy=pre</code>声明使用预发服务器。(注意：url参数是
+加在引用css的html文档的请求，通过referer判断)，下面less编译参数同样原理。后面会
+把预发控制放在配置文件中控制，在配置文件中更改可能更方便。
+</p>
+
+<h3 id="toc_0.0.5">less规则</h3>
+
+<p>
+请求为<code>&lt;link href="foo/a.css"&gt;</code>，less解析过程，首先判断<code>foo/a.less</code>文件是否存在， 
+如果存在，调用less模块，解析并且返回结果。
+</p>
+
+<p>
+less解析过程，很可能会出现错误，plum中错误通过控制台log打印错误信息。为了能够方便
+查看错误信息，可以在一个新标签打开css请求，这样就不会受到其他请求日志信息的干扰。
+</p>
+
+<p>
+less解析，并不会每次写入到对应的css文件中，如果需要写入，请在请求的url中加上<code>less</code> 
+参数。css写入成功，可以在控制台中看到一条<code>[less build success]</code>的信息。
+</p>
+
+<h3 id="toc_0.0.6">php/tms</h3>
+
+<p>
+tms规则主要用于tms本地预览，在0.3.6版本后开始支持cms标签。plum能够做到tms中面向
+类容标签(不支持结构标签)的预览，不过，tms后面已经支持本地开发，预览，并且直接同
+步线上，plum/tms规则，只用于老的tms规则维护与修改，如果新开发，请使用tms最新的
+dpl。
+</p>
+
+<p>
+注意：<code>php/tms</code>规则，判断规则是请求url中必须有url参数<code>tms</code>。比如，请求是：
+<code>http://market/a.php</code>，如果需要用<code>php/tms</code>规则生成模拟数据，需要在url后面加上参
+数：<code>http://market/a.php?tms</code>。此外，还有一个参数<code>build</code>用于声明执行build过程，
+此过程，把文件中引用文件合并输出，并且生成文件同名，后缀为html的demo文件，用于
+demo展示。
+</p>
+
+<h4 id="toc_0.0.6.1">tms头尾模拟</h4>
+
+<p>
+tms开发中，通常只需要开发中间部分，头尾使用线上统一文件。plum中，通过一定html注
+释，区分线上和本地状态，最后通过url参数，<code>?build</code>，生成线上文件。
+</p>
+
+<pre class="prettyprint linenums lang-php">
+&lt;?php include 'common/head.php'; $isOnline = false; ?&gt;
+&lt;link rel="stylesheet" href="index/css/index.css" /&gt;
+&lt;script charset="utf-8" src="index/js/p4plist.js"&gt;&lt;/script&gt;
+&lt;!--head include('/home/admin/go/market/5135/__header.php');
+$isOnline = true; head--&gt;
+&lt;script type="text/javascript"&gt;
+  &lt;?php if ($isOnline): ?&gt;
+  &lt;?php include 'index/js/p4plist.js'; ?&gt;
+  &lt;?php endif; ?&gt;
+&lt;/script&gt;
+
+&lt;div class="content"&gt;
+  &lt;?php include 'index/vnav.php'; ?&gt;
+&lt;/div&gt;
+
+&lt;!--foot include('/home/admin/go/market/5135/__footer.php') foot--&gt;
+&lt;script src="index/js/index.js"&gt;&lt;/script&gt;
+&lt;?php include 'common/foot.php'; ?&gt;
+</pre>
+  
+<p>
+上面代码中，1-3行是本地开发的头部分，<code>common/head.php</code>文件是本地获取的，执行build
+以后，4-5行中，<code>&lt;!--head</code>会被替换为<code>&lt;?php</code>标签结束和开始。所以<code>$isOnline</code>变量，
+在线上是true，而本地开发中是false。通常情况下是无需这样区分的，只是本例是一个活动
+页面，发布以后css和js需要一起引入到页面中。在开发中是单独请求，线上时使用
+<code>&lt;?php include 'index/js/p4plist.js'; ?&gt;</code>会被把内容替换为<code>index/js/p4plist.js</code>
+文件里面的内容。同样，php文件使用同样的方式引用(第8行)。当请求url参数有<code>build</code>
+时，所有<code>include|require|include_once|require_once</code>引用的文件都会合并到一起，把
+浏览器返回的字符串拷贝到tms编辑框中就行。
+</p>
+
+<p>
+上面同步的过程还是非常郁闷的，不过，至少可以在本地开发了，最好的方式应该是，本地
+开发，然后直接提交线上，新版tms已经实现上述功能。
+</p>
+
+<h4 id="toc_0.0.6.2">默认数据规则</h4>
+
+<p>
+使用tms标签或者cms标签，plum会生成同文件名(后缀json)的数据文件，默认情况下生成
+一份数据，可以自行修改默认数据。默认数据通过name识别位置，一个页面中，tms标签
+的name一定不能重复，包括repeat和module标签，都不能重复(这两者传到tms会有问题)。
+</p>
+
+<p>
+默认数据大致分为字符串、链接、图片三种，字符串默认都是<code>string</code>，链接默认都是
+<code>www.taobao.com</code>，图片使用的是fed上一个图片自动生成工具，图片大小识别是通过
+<code>title</code>描述中的<code>[200x200]</code>识别的，一定要如此注明图片大小，否则tms图片会有问题，
+这样也方便运营填数据，在<code>custom</code>标签中，在fields的描述中识别，比如
+<code>fields:"a:img[200x200]:img"</code>。
+</p>
+
+<p>
+当tms标签中的key修改了以后，默认数据会自动合并原有的数据，删除不再存在的数据。不
+过，如果修改的是<code>row</code>参数，生成的数据条数不会更改，这个如果需要，请自行删除对应
+的数据，或者更改标签的name值。
+</p>
+
+<h3 id="toc_0.0.7">log控制台</h3>
+
+<p>
+控制台显示实时信息，包括请求在服务端耗时，解析规则过程，和错误信息提示。提示消息
+如下：
+</p>
+
+<pre class="prettyprint linenums">
+[Origin begin]: 1 files(guarantee.php)
+[Hook php/tms reject]: file /nongye/demo/guarantee.php(0). spend time:1
+[Hook php/proxy receive]: file /nongye/demo/guarantee.php(0). spend time:2
+[Hook php/proxy]: Get file /nongye/demo/guarantee.php(0). spend time:36
+[Origin end]: spend time: 36ms
+</pre>
+  
+<h4 id="toc_0.0.7.1">debug</h4>
+
+<p>
+log信息的控制，通过配置文件配置(<code>127.0.0.1/config</code>)。开启debug模式，才会出现上面
+所有信息，<code>[Origin begin]</code>表示一个请求开始，到结束，显示总时间，下面是每个文件
+请求过程，这里一共一个文件，开始经过<code>php/tms</code>规则，返回<code>reject</code>，拒绝处理，因为
+<code>php/tms</code>规则，规定文件必须有url参数<code>tms</code>才接受处理，url参数用于区分tms请求，还是
+普通php请求。拒绝操作以后，进入的是<code>php/proxy</code>处理，返回<code>receive</code>，接受处理。
+</p>
+
+<h4 id="toc_0.0.7.2">logBasic</h4>
+
+<p>
+通常情况，无需打开debug模式，还有参数<code>logBasic</code>，显示请求基本信息，包括请求包涵
+文件数，和请求总费时，也就是上面的第一行和最后一行信息。
+</p>
+
+<h4 id="toc_0.0.7.3">logFiles &amp; logHooks</h4>
+
+<p>
+这两个参数用于配置，符合条件的请求，输出log信息，用于手动过滤。分别从两个不同的
+维度来配置，文件和规则。<code>logFiles</code>配置符合条件的文件名规则，<code>logHooks</code>配置，符合
+条件的规则可以输出到控制台。
+</p>
+
+      </div>
+      <script src="js/kissy/kissy.js"></script>
+      <script src="js/kissy/sizzle.js"></script>
+      <script src="js/spy.js" type="text/javascript"></script>
+      <script src="./js/article.js" type="text/javascript"></script>
+   </div>
+   <div id="footer">
+   <p class="copyright">
+   <a href="index.html">Home</a>
+   |<a href="http://github.com/shepherdwind/joycss/">Code</a>
+   ©<a href="http://shepherdwind.com" target="_blank">shepherdwind</a>⋅ 2012</p>
+   </div>
+   <script src="js/prettify/prettify.js" type="text/javascript"></script>
+   <script src="js/prettify/lang-css.js" type="text/javascript"></script>
+   <script type="text/javascript">prettyPrint();</script>
   </body>
 </html>
