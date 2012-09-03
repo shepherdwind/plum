@@ -63,9 +63,11 @@ function tms_common ( $args , $attributes='' ) { //-----------------------------
     $args = tb_json_decode($args);
 
 
+    /*
     if(!array_key_exists('name',$args)||!array_key_exists('title',$args)||!array_key_exists('group',$args)) {
         echo "！@#￥！标签缺少name或title或group属性，上传到TMS会出错";
     }
+     */
     /** 合并特殊值 */
     $defaults = tms_parse_args ( $attributes , $defaults );
     $r = tms_parse_args ( $args ,$defaults );

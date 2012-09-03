@@ -3,11 +3,11 @@
  * @author hanwen<hanwen.sah@taobao.com>
  */
 'use strict';
-var stdclass = require('../../lib/stdclass');
+var stdclass = require('../../../lib/stdclass');
 var path     = require('path');
 var fs       = require('fs');
 var spawn    = require('child_process').spawn;
-var TMS_PATH = path.resolve(__dirname, '../../lib/') + '/tms.php';
+var TMS_PATH = __dirname + '/tms.php';
 var URL      = require('url');
 var exists = fs.exists || path.exists;
 

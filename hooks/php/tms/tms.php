@@ -17,6 +17,7 @@ if (file_exists($json_file)){
 }
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname($file) . '/');
 include('tmsTag.php');
+include('vmToPhp.php');
 
 if ($isSyntax){
     error_reporting(E_ALL);
@@ -35,6 +36,7 @@ function repeatReplace ($file)
     $run =  $part['run'];
     $content = tms_include($content, $file);
     $phpContent = $run[0] . $content . $run[1];;
+    $phpContent = vmToPhp($phpContent);
 
     if ($isBuild)
     {
@@ -95,10 +97,25 @@ function tms_handle_header_foot($str)
     $footStart = strpos($str, $commentStart . $foot);
     $footEnd   = strpos($str, $foot . $commentEnd);
 
-    $startTms = substr($str, 0, $headStart);
-    $start = substr($str, $headStart + $headLen, $headEnd - $headStart - $headLen);
-    $end   = substr($str, $footStart + $footLen, $footEnd - $footStart - $footLen);
-    $endTms   = substr($str, $footEnd + $footLen);
+    if ($headStart === false){
+        $startTms = '';
+        $start = '';
+        $headEnd = 0;
+        $headLen = 1;
+    } else {
+        $startTms = substr($str, 0, $headStart);
+        $start = substr($str, $headStart + $headLen, $headEnd - $headStart - $headLen);
+    }
+
+    if($footStart === false){
+        $footStart = strlen($str);
+        $end   = '';
+        $endTms   = '';
+    } else {
+        $end   = substr($str, $footStart + $footLen, $footEnd - $footStart - $footLen);
+        $endTms   = substr($str, $footEnd + $footLen);
+    }
+
     $mid   = substr($str, $headEnd + $headLen - 1, $footStart - $headEnd - $headLen + 1);
     return array(
         'run' => array($startTms, $endTms),
