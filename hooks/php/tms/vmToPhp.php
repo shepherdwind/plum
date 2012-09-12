@@ -33,7 +33,7 @@ function cms2tms($match){
     $match[2] = str_replace('(', '[', $match[2]);
     $match[2] = str_replace(')', ']', $match[2]);
     $match[2] = str_replace('*', 'x', $match[2]);
-    $match[2] = str_replace('default', 'defaultRow', $match[2]);
+    $match[2] = str_replace('default=', 'defaultRow=', $match[2]);
 
     if ($match[1] == 'repeat'){
         $text .= '_tms_' . $match[1];

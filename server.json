@@ -26,8 +26,8 @@
             "statics" : ["statics"]
           }
         },
-        "/p/market/nongye/": {
-            "path": "/Users/eward/deploy/market/nongye/",
+        "/p/market/": {
+            "path": "/Users/eward/deploy/market/",
             "hooks": {
                 "statics" : ["statics"]
             }
@@ -40,7 +40,9 @@
     "assets.daily.taobao.net":{
       "equal":"a.tbcdn.cn"
     },
-
+    "vm":{
+      "path":"/Users/eward/deploy/webapp/"
+    },
     "sdk":{
       "path":"/Users/eward/Sites/TSDK/"
     }

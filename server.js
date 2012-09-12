@@ -85,8 +85,19 @@ Server.prototype = {
     this.data = [];
     var self = this;
     req.on('data', function(chunk) {
-      self.data.push(new Buffer(chunk));
+      self.data.push(chunk);
     });
+    req.on('end', function(){
+      self._start();
+    });
+
+  },
+
+  _start: function(){
+    var req = this.request;
+    var res = this.response;
+
+    var self = this;
 
     var host = req.headers.host;
     var refer = req.headers.referer;
@@ -146,6 +157,7 @@ Server.prototype = {
     var type = this.get('type');
     type = MIME[ext] || MIME['.txt'];
     this.set('type', type);
+
   },
 
   _getMaps: function(serverConfig, files, ext){

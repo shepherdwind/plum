@@ -128,13 +128,15 @@ stdclass.extend(Hook, stdclass, {
     var headers = {};
 
     for(var x in request.headers){
-      headers[x] = request.headers[x];
+      var parts = x.split('-');
+      parts = parts.map(function(str){
+        return str[0].toUpperCase() + str.slice(1);
+      });
+      headers[parts.join('-')] = request.headers[x];
     }
 
-    headers['Content-Type']= 'application/x-www-form-urlencoded';
-
     var proxyServer = http.request({
-      host    : 'localhost',
+      host    : headers['host'],
       port    : port,
       method  : request.method,
       headers : headers,
@@ -160,19 +162,7 @@ stdclass.extend(Hook, stdclass, {
     this.get('data').forEach(function(buf){
       proxyServer.write(buf);
     });
-
-    request.on('data', function(chunk) {
-      proxyServer.write(new Buffer(chunk));
-    });
-
-    if (request.complete){
-      proxyServer.end();
-    }
-
-    request.on('end', function() {
-      proxyServer.end();
-    });
-
+    proxyServer.end();
   }
 
 });
