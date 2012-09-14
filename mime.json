@@ -10,5 +10,6 @@
   ".html" : "text/html",
   ".php"  : "text/html",
   ".htm"  : "text/html",
+  "*"     : "text/html",
   ".txt"  : "text/plain"
 }

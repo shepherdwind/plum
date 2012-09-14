@@ -307,8 +307,9 @@ stdclass.extend(Origin, stdclass, {
     if (this.isFinish()) return;
 
     var received = this.get('received');
-    var path = this.get('path');
-    var filePath = path + file;
+    var basePath = this.get('path');
+    var maps = this.get('maps');
+    var filePath = maps[file] || basePath + file;
 
     if (file && !received[file]) {
       this.log.push({

@@ -43,9 +43,20 @@
     "vm":{
       "path":"/Users/eward/deploy/webapp/"
     },
+    
     "sdk":{
-      "path":"/Users/eward/Sites/TSDK/"
+      "path":"/Users/eward/Sites/TSDK/",
+      "hooks": {
+          "*": ["php/proxy"]
+      },
+      "maps": {
+          "/assets/":{
+              "path": "{base}/sail/page/assets/",
+              "index": 0
+          }
+      }
     }
+    
   },
 
   "bin":{"php":"php"},
@@ -62,5 +73,5 @@
   ],
   "logHooks" : ["less", "statics"],
   "logBasic" : false,
-  "debug"    : true
+  "debug"    : false
 }

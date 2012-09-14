@@ -8,6 +8,7 @@ var path     = require('path');
 var http     = require('http');
 var fs       = require('fs');
 var exists   = fs.exists || path.exists;
+var existsSync   = fs.existsSync || path.existsSync;
 var spawn    = require('child_process').spawn;
 var phpserver = {};
 var port  = 8080;
@@ -27,10 +28,10 @@ function Hook(){
 stdclass.extend(Hook, stdclass, {
 
   attributes: {
-    path: '',
-    files: [],
-    len: 0,
-    initialized: true
+    path        : '',
+    files       : [],
+    len         : 0,
+    initialized : true
   },
 
   CONSIT: {
@@ -59,7 +60,8 @@ stdclass.extend(Hook, stdclass, {
       if (file === false) return this._add();
 
       var filePath = basePath + file;
-      exists(filePath, this._do.bind(this, file, i));
+      //接受所有请求
+      this._do(file, i, true);
 
       return null;
 
@@ -82,31 +84,29 @@ stdclass.extend(Hook, stdclass, {
     this.fire('receive', {file: file, index: i});
     this._add();
 
-    var self = this;
-    var basePath = this.get('path');
-    var server = phpserver[basePath];
-    if (!server) {
-      port = port + 1;
-      var _run = spawn('php',['-S','127.0.0.1:' + port], {cwd: basePath});
-      console.log('[proxy php]run php server on port: ' + port);
-      server = {server: _run, port: port};
-      phpserver[basePath] = server;
-    }
+    var self     = this;
 
-    function pingIt(){
-      var ping = spawn('ping', ['-c', 1, '127.0.0.1:' + port]);
-      ping.stdout.on('data', function (data) {
+    var basePath = this.get('path');
+    var server   = phpserver[basePath];
+    if (!server) {
+      port     = port + 1;
+      var argvs = ['-S','127.0.0.1:' + port];
+      var rewriteFile = basePath + '/__route.php';
+      if (existsSync(rewriteFile)) argvs.push('__route.php');
+      var _run = spawn('php', argvs, {cwd: basePath});
+
+      /*
+      _run.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
       });
 
-      ping.stderr.on('data', function (data) {
+      _run.stderr.on('data', function (data) {
         console.log('stderr: ' + data);
       });
-
-      ping.on('exit', function (code) {
-        console.log('child process exited with code ' + code);
-      });
-
+      */
+      server   = {server: _run, port: port};
+      phpserver[basePath] = server;
+      console.log('[proxy php]run php server on port: ' + port);
     }
 
     if (_run){
@@ -128,11 +128,15 @@ stdclass.extend(Hook, stdclass, {
     var headers = {};
 
     for(var x in request.headers){
+      headers[toUper(x)] = request.headers[x];
+    }
+
+    function toUper(x){
       var parts = x.split('-');
       parts = parts.map(function(str){
         return str[0].toUpperCase() + str.slice(1);
       });
-      headers[parts.join('-')] = request.headers[x];
+      return parts.join('-');
     }
 
     var proxyServer = http.request({
@@ -144,7 +148,12 @@ stdclass.extend(Hook, stdclass, {
     });
 
     proxyServer.on('response', function (res) {
+      var _headers = {};
 
+      for(var x in res.headers){
+        _headers[toUper(x)] = res.headers[x];
+      }
+      self.fire('set:header', {headers: _headers, code: res['statusCode']});
       res.on('data', function(data){
         self.fire('data', {data: data, index: i});
       });
