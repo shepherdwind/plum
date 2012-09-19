@@ -3,21 +3,24 @@
  * @author hanwen<hanwen.sah@taobao.com>
  */
 'use strict';
-var stdclass = require('../../lib/stdclass');
-var path     = require('path');
-var http     = require('http');
-var fs       = require('fs');
-var exists   = fs.exists || path.exists;
-var existsSync   = fs.existsSync || path.existsSync;
-var spawn    = require('child_process').spawn;
-var phpserver = {};
-var port  = 8080;
+var stdclass   = require('../../lib/stdclass');
+var path       = require('path');
+var http       = require('http');
+var fs         = require('fs');
+var exists     = fs.exists || path.exists;
+var existsSync = fs.existsSync || path.existsSync;
+var spawn      = require('child_process').spawn;
+var phpserver  = {};
+var port       = 8080;
 
 process.on('exit',function(){
   var keys = Object.keys(phpserver);
   keys.forEach(function(key){
     console.log('kill php server on port:' + phpserver[key].port);
-    phpserver[key]['server'].kill('SIGHUP');
+    for (var i = 0; i < phpserver[key].num; i++) {
+      var id = i || '';
+      phpserver[key]['server' + id].kill('SIGHUP');
+    }
   });
 });
 
@@ -89,36 +92,75 @@ stdclass.extend(Hook, stdclass, {
     var basePath = this.get('path');
     var server   = phpserver[basePath];
     if (!server) {
-      port     = port + 1;
-      var argvs = ['-S','127.0.0.1:' + port];
-      var rewriteFile = basePath + '/__route.php';
-      if (existsSync(rewriteFile)) argvs.push('__route.php');
-      var _run = spawn('php', argvs, {cwd: basePath});
-
-      /*
-      _run.stdout.on('data', function (data) {
-        console.log('stdout: ' + data);
-      });
-
-      _run.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
-      });
-      */
-      server   = {server: _run, port: port};
-      phpserver[basePath] = server;
-      console.log('[proxy php]run php server on port: ' + port);
+      server = this._createServer();
+      var _run = true;
     }
 
     if (_run){
       //延迟400ms，等待php服务器启动
       setTimeout(function(){
-        self._proxy(server['port'], file, i);
+        self._proxy(self._chooseServer(basePath), file, i);
       }, 400);
     } else {
-      self._proxy(server['port'], file, i);
+      self._proxy(self._chooseServer(basePath), file, i);
     }
 
     return null;
+  },
+
+  _chooseServer: function(basePath){
+    var customs = this.get('customs');
+    var server = phpserver[basePath];
+    var ret = server['port'];
+    if (customs && customs['thread']){
+      var id = server['id'];
+      //0 or null
+      if (!id) {
+        server['id'] = 1;
+      } else if(customs['thread'] > id) {
+        server['id'] ++;
+        ret = server['port' + id];
+      } else {
+        server['id'] = 1;
+      }
+    }
+
+    return ret;
+  },
+
+  _createServer: function(){
+    var customs = this.get('customs');
+    var server = {};
+    var thread = customs ? parseInt(customs.thread, 10): 1;
+    var basePath = this.get('path');
+    thread = thread || 1;
+
+    for (var i = 0; i < thread; i++) {
+      port = port + 1;
+      var argvs = ['-S','127.0.0.1:' + port];
+      var rewriteFile = basePath + '/__route.php';
+      if (existsSync(rewriteFile)) argvs.push('__route.php');
+      var _run = spawn('php', argvs, {cwd: basePath});
+
+      _run.stdout.on('data', function (data) {
+        //console.log('stdout: ' + data);
+      });
+
+      _run.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+      });
+
+      var _id = i || '';
+
+      server['server' + _id] =  _run;
+      server['port' + _id] = port;
+      console.log('[proxy php]run php server on port: ' + port);
+    }
+    server.num = thread;
+    server.id = 0;
+
+    phpserver[basePath] = server;
+    return server;
   },
 
   _proxy: function(port, file, i){
@@ -140,7 +182,7 @@ stdclass.extend(Hook, stdclass, {
     }
 
     var proxyServer = http.request({
-      host    : headers['host'],
+      host    : '127.0.0.1',
       port    : port,
       method  : request.method,
       headers : headers,

@@ -19,6 +19,9 @@
     },
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
+      "customs": {
+          "proxy": ""
+      },
       "maps":{
         "/tmse/5137/assets/":{
           "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
@@ -55,6 +58,17 @@
               "index": 0
           }
       }
+    },
+    
+    "dpl":{
+        "path":"/Users/eward/Sites/dpl",
+        "hooks": {
+            "*": ["php/proxy"],
+            ".css": ["statics"]
+        },
+        "customs": {
+            "thread": 8
+        }
     }
     
   },
@@ -73,5 +87,5 @@
   ],
   "logHooks" : ["less", "statics"],
   "logBasic" : false,
-  "debug"    : false
+  "debug"    : 0
 }

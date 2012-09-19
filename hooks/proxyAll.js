@@ -25,7 +25,8 @@ stdclass.extend(Proxy, stdclass, {
     path: '',
     files: [],
     len: 0,
-    initialized: false
+    initialized: false,
+    proxy: 'pub'
   },
 
   CONSIT: {
@@ -74,13 +75,14 @@ stdclass.extend(Proxy, stdclass, {
       this.set('initialized', true, false);
       isDaily = true;
     } else {
-      var uri = referer && url.parse(referer, true);
-      //使用预发
-      if (uri && uri.query && uri.query.proxy == 'pre'){
-        IP_PUB = IP_PRE;
+      var customs = this.get('customs') || {};
+      var proxy = customs.proxy || {};
+      if (proxy == 'pre'){
         this.set('initialized', true, false);
+        this.set('proxy', proxy);
+      } else {
+        this.set('proxy', 'pub');
       }
-
       isDaily = false;
     }
   },
@@ -114,6 +116,7 @@ stdclass.extend(Proxy, stdclass, {
     //接受处理
     this.fire('receive', {file: file, index: i});
     this._add();
+    var ip = this.get('proxy') == 'pre'? IP_PRE : IP_PUB;
 
     var self = this;
     var ret = [];
@@ -122,7 +125,7 @@ stdclass.extend(Proxy, stdclass, {
       headers: {
         host: HOST
       },
-      host: isDaily ? DAILY_IP : IP_PUB,
+      host: isDaily ? DAILY_IP : ip,
       port: 80,
       path: file
     }, function (res) {

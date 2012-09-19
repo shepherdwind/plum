@@ -147,6 +147,7 @@ Server.prototype = {
     var cfg = {
       path: basePath,
       maps: mapPath,
+      customs: serverConfig.customs,
       files: files,
       len: files.length,
       ext: ext,
@@ -258,288 +259,288 @@ Server.prototype = {
     hook.once('data', function(){
       HEADER['Content-Type'] = this.get('type');
       res.writeHead(STATUS_CODE, HEADER);
-      }, this);
-      hook.on('data', this.success, this);
+    }, this);
+    hook.on('data', this.success, this);
 
-      hook.once('end', function(){
-        res.end();
-        //超过20ms的信息log出来
-        //if (hook.getSpendTime() > 20){
-        hook.log.forEach(function(msg){
-          if (_this._shouldShow(msg)) {
-            var level = 'info';
-            if (msg.log.indexOf('reject') > -1) level = 'debug';
-            log(msg.log, level, msg.msg || '');
-          }
-        });
-        //}
-      });
-      hook.once('err', this.error, this);
-      hook.parse();
-
-    },
-
-    //是否在log信息中显示
-    _shouldShow: function(msg){
-      if (!config.debug){
-        if (msg.type == 'hook'){
-          var logHooks = config.logHooks || [];
-          var logFiles = config.logFiles || [];
-          var hook = msg.hook;
-          var file = msg.file;
-          var ext  = path.extname(file);
-
-          if (logHooks.indexOf(hook) !== -1) {
-            return true;
-          } else {
-            return logFiles.some(function(fileDesc){
-              var isFile = file.indexOf(fileDesc.path) !== -1;
-              var isExt  = !fileDesc.ext || fileDesc.ext.indexOf(ext) !== -1;
-              return isFile && isExt;
-            });
-          }
-
-        } else if(config.logBasic){
-          return true;
+    hook.once('end', function(){
+      res.end();
+      //超过20ms的信息log出来
+      //if (hook.getSpendTime() > 20){
+      hook.log.forEach(function(msg){
+        if (_this._shouldShow(msg)) {
+          var level = 'info';
+          if (msg.log.indexOf('reject') > -1) level = 'debug';
+          log(msg.log, level, msg.msg || '');
         }
-      } else {
+      });
+      //}
+    });
+    hook.once('err', this.error, this);
+    hook.parse();
+
+  },
+
+  //是否在log信息中显示
+  _shouldShow: function(msg){
+    if (!config.debug){
+      if (msg.type == 'hook'){
+        var logHooks = config.logHooks || [];
+        var logFiles = config.logFiles || [];
+        var hook = msg.hook;
+        var file = msg.file;
+        var ext  = path.extname(file);
+
+        if (logHooks.indexOf(hook) !== -1) {
+          return true;
+        } else {
+          return logFiles.some(function(fileDesc){
+            var isFile = file.indexOf(fileDesc.path) !== -1;
+            var isExt  = !fileDesc.ext || fileDesc.ext.indexOf(ext) !== -1;
+            return isFile && isExt;
+          });
+        }
+
+      } else if(config.logBasic){
         return true;
       }
-    },
+    } else {
+      return true;
+    }
+  },
 
-    /**
-     * 处理错误
-     */
-    error: function (e){
-      var response = this.response;
-      var file = e.file || '';
-      log('Error ' + e.type, 'error', file || e.message);
-      response.writeHead(e.type, {
-        'Content-Type': MIME['.html'],
-        'Server': 'Node'
-      });
-      response.write(e.message);
-      response.end();
-      this.finished = true;
-    },
+  /**
+   * 处理错误
+   */
+  error: function (e){
+    var response = this.response;
+    var file = e.file || '';
+    log('Error ' + e.type, 'error', file || e.message);
+    response.writeHead(e.type, {
+      'Content-Type': MIME['.html'],
+      'Server': 'Node'
+    });
+    response.write(e.message);
+    response.end();
+    this.finished = true;
+  },
 
-    writeHead: function(){
-      var header = this.get('header');
-      var response = this.response;
-      Object.keys(header).forEach(function(name){
-        response.writeHead(name, header[name]);
-      });
-    },
+  writeHead: function(){
+    var header = this.get('header');
+    var response = this.response;
+    Object.keys(header).forEach(function(name){
+      response.writeHead(name, header[name]);
+    });
+  },
 
-    /**
-     * 成功解析
-     */
-    success: function(e){
-      var response = this.response;
-      e.data.forEach(function(buf){
-        if (buf) response.write(buf);
-      });
-    },
+  /**
+   * 成功解析
+   */
+  success: function(e){
+    var response = this.response;
+    e.data.forEach(function(buf){
+      if (buf) response.write(buf);
+    });
+  },
 
-    /**
-     * 合并equal并且，支持group配置
-     */
-    getServerConfig: function(server, refer){
+  /**
+   * 合并equal并且，支持group配置
+   */
+  getServerConfig: function(server, refer){
 
-      var cfg = config['servers'][server];
-      if (!cfg) {
-        if (refer && refer == 'http://127.0.0.1/config') {
-          cfg = {path: path.resolve(__dirname, './gui/')};
-        } else { 
-          cfg = {path: config['www']};
-        }
-        config['servers'][server] = cfg;
+    var cfg = config['servers'][server];
+    if (!cfg) {
+      if (refer && refer == 'http://127.0.0.1/config') {
+        cfg = {path: path.resolve(__dirname, './gui/')};
+      } else { 
+        cfg = {path: config['www']};
+      }
+      config['servers'][server] = cfg;
+    }
+
+    //处理equal关系
+    if (!cfg.path && cfg.equal){
+      cfg = this.getServerConfig(cfg.equal);
+    } 
+
+    if (!servers[server]){
+
+      cfg.hooks = cfg.hooks || {};
+      var hooks = cfg.hooks;
+      this.mixInHooks(hooks, hooks, server);
+      this.mixInHooks(hooks, config.hooks, 'global');
+
+      if (cfg.maps){
+        var _maps = Object.keys(cfg.maps);
+        _maps.forEach(function(key){
+          var _hooks = cfg.maps[key].hooks;
+          if (_hooks) this.mixInHooks(_hooks, _hooks);
+        }, this);
       }
 
-      //处理equal关系
-      if (!cfg.path && cfg.equal){
-        cfg = this.getServerConfig(cfg.equal);
-      } 
+      servers[server] = true;
+    } 
+    return cfg;
+  },
 
-      if (!servers[server]){
-
-        cfg.hooks = cfg.hooks || {};
-        var hooks = cfg.hooks;
-        this.mixInHooks(hooks, hooks, server);
-        this.mixInHooks(hooks, config.hooks, 'global');
-
-        if (cfg.maps){
-          var _maps = Object.keys(cfg.maps);
-          _maps.forEach(function(key){
-            var _hooks = cfg.maps[key].hooks;
-            if (_hooks) this.mixInHooks(_hooks, _hooks);
-          }, this);
-        }
-
-        servers[server] = true;
-      } 
-      return cfg;
-    },
-
-    mixInHooks: function(hooks, datas, server){
-      Object.keys(datas).forEach(function(ext){
-        var hook = datas[ext];
-        if (ext[0] !== '.' && ext !== ALL_FILES){
-          var exts = this.getGroupExts(ext);
-          exts.forEach(function(ex){
-            hooks[ex] = hooks[ex] || [];
-            hooks[ex] = hooks[ex].concat(hook.slice());
-          });
-        } else {
-          hooks[ext] = hooks[ext] || [];
-          if (!(hooks[ext] instanceof Array)){
-            var err = 'on server ' + server +
-                      ' , hook {' + ext + '} must be array';
-            log('Error config', 'error', err);
-            this.error({
-              type: '505',
-              message: '[Error config]' + err
-            });
-          }
-          hooks[ext] = hooks[ext].concat(hook.slice());
-        }
-      }, this);
-      return hooks;
-    },
-
-    getGroupExts: function(group){
-      var ret = [];
-
-      getGroup(group);
-      function getGroup(ext){
-        try{
-          var exts = config['groups'][ext];
-
-          exts.forEach(function(extReal){
-            if (extReal[0] === '.'){
-              ret.push(extReal);
-            } else {
-              getGroup(extReal);
-            }
-          });
-        }catch(e){
-          throw new Error('Group ' + ext + ' not defined in config.json');
-        }
-      }
-
-      return ret;
-
-    },
-
-    /**
-     * 解combine的url
-     * @param url {string} 合并url路径，a.tbcdn.cn/??a.css,b.css,c.css
-     * @return {array} 返回数组，url分别对应的文件
-     */
-    parse: function(url){//{{{
-      var ret = [];
-      url.replace('\\', '/');
-
-      var combo = url.indexOf('??');
-      var base, files;
-
-      if (-1 !== combo) {
-        base = url.slice(0, combo);
-        files = url.slice(combo + 2);
-
-        files = files.split('?')[0];
-        files = files.split('#')[0];
-
-        files = files.split(',');
-
-        files.forEach(function (file) {
-          var _url = base + file;
-          ret.push(_url.replace('//', '/'));
+  mixInHooks: function(hooks, datas, server){
+    Object.keys(datas).forEach(function(ext){
+      var hook = datas[ext];
+      if (ext[0] !== '.' && ext !== ALL_FILES){
+        var exts = this.getGroupExts(ext);
+        exts.forEach(function(ex){
+          hooks[ex] = hooks[ex] || [];
+          hooks[ex] = hooks[ex].concat(hook.slice());
         });
       } else {
-        url = url.split('?')[0];
-        url = url.split('#')[0];
-        ret.push(url);
-      }
-
-      return ret;
-    }//}}}
-
-  };
-
-  function getStatus(req, res, json, message, version) {//{{{
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    var html = fs.readFileSync(__dirname + '/gui/config.html').toString();
-    html = html.replace('{{config}}', json);
-    html = html.replace('{{version}}', version);
-    html = html.replace('{{message}}', message || '');
-    res.end(html);
-  }//}}}
-
-  function setStatus(req, res, file, version){
-    req.setEncoding('utf8');
-    var formData = '';
-    req.on('data', function (data) {
-      formData += data;
-    });
-    req.on('end', function (data) {
-      formData = querystring.parse(formData);
-      var json = formData.code.trim();
-      var message = '配置成功';
-
-      try {
-        config = cjson.parse(json);
-        config.port = config.proxy || 80;
-        servers = {};
-        configStr = json;
-        fs.writeFileSync(file, json);
-      } catch (e){
-        log('error', 'error', e);
-        message = "配置失败:" + e.toString();
-      }
-
-      getStatus(req, res, json, message, version);
-    });
-  }
-
-  function formatJson(val) {
-    var retval = '';
-    var str = val.replace(/[\n\r\s]+/g, '');
-    var pos = 0;
-    var strLen = str.length;
-    var indentStr = '  ';
-    var newLine = "\n";
-    var _char = '';
-
-    for (var i=0; i<strLen; i++) {
-      _char = str.substring(i,i+1);
-
-      if (_char == '}' || _char == ']') {
-        retval = retval + newLine;
-        pos = pos - 1;
-
-        for (var j=0; j<pos; j++) {
-          retval = retval + indentStr;
+        hooks[ext] = hooks[ext] || [];
+        if (!(hooks[ext] instanceof Array)){
+          var err = 'on server ' + server +
+                    ' , hook {' + ext + '} must be array';
+          log('Error config', 'error', err);
+          this.error({
+            type: '505',
+            message: '[Error config]' + err
+          });
         }
+        hooks[ext] = hooks[ext].concat(hook.slice());
       }
+    }, this);
+    return hooks;
+  },
 
-      retval = retval + _char;	
+  getGroupExts: function(group){
+    var ret = [];
 
-      if (_char == '{' || _char == '[' || _char == ',') {
-        retval = retval + newLine;
+    getGroup(group);
+    function getGroup(ext){
+      try{
+        var exts = config['groups'][ext];
 
-        if (_char == '{' || _char == '[') {
-          pos = pos + 1;
-        }
-
-        for (var k=0; k<pos; k++) {
-          retval = retval + indentStr;
-        }
+        exts.forEach(function(extReal){
+          if (extReal[0] === '.'){
+            ret.push(extReal);
+          } else {
+            getGroup(extReal);
+          }
+        });
+      }catch(e){
+        throw new Error('Group ' + ext + ' not defined in config.json');
       }
     }
 
-    return retval;
+    return ret;
 
+  },
+
+  /**
+   * 解combine的url
+   * @param url {string} 合并url路径，a.tbcdn.cn/??a.css,b.css,c.css
+   * @return {array} 返回数组，url分别对应的文件
+   */
+  parse: function(url){//{{{
+    var ret = [];
+    url.replace('\\', '/');
+
+    var combo = url.indexOf('??');
+    var base, files;
+
+    if (-1 !== combo) {
+      base = url.slice(0, combo);
+      files = url.slice(combo + 2);
+
+      files = files.split('?')[0];
+      files = files.split('#')[0];
+
+      files = files.split(',');
+
+      files.forEach(function (file) {
+        var _url = base + file;
+        ret.push(_url.replace('//', '/'));
+      });
+    } else {
+      url = url.split('?')[0];
+      url = url.split('#')[0];
+      ret.push(url);
+    }
+
+    return ret;
+  }//}}}
+
+};
+
+function getStatus(req, res, json, message, version) {//{{{
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  var html = fs.readFileSync(__dirname + '/gui/config.html').toString();
+  html = html.replace('{{config}}', json);
+  html = html.replace('{{version}}', version);
+  html = html.replace('{{message}}', message || '');
+  res.end(html);
+}//}}}
+
+function setStatus(req, res, file, version){
+  req.setEncoding('utf8');
+  var formData = '';
+  req.on('data', function (data) {
+    formData += data;
+  });
+  req.on('end', function (data) {
+    formData = querystring.parse(formData);
+    var json = formData.code.trim();
+    var message = '配置成功';
+
+    try {
+      config = cjson.parse(json);
+      config.port = config.proxy || 80;
+      servers = {};
+      configStr = json;
+      fs.writeFileSync(file, json);
+    } catch (e){
+      log('error', 'error', e);
+      message = "配置失败:" + e.toString();
+    }
+
+    getStatus(req, res, json, message, version);
+  });
+}
+
+function formatJson(val) {
+  var retval = '';
+  var str = val.replace(/[\n\r\s]+/g, '');
+  var pos = 0;
+  var strLen = str.length;
+  var indentStr = '  ';
+  var newLine = "\n";
+  var _char = '';
+
+  for (var i=0; i<strLen; i++) {
+    _char = str.substring(i,i+1);
+
+    if (_char == '}' || _char == ']') {
+      retval = retval + newLine;
+      pos = pos - 1;
+
+      for (var j=0; j<pos; j++) {
+        retval = retval + indentStr;
+      }
+    }
+
+    retval = retval + _char;	
+
+    if (_char == '{' || _char == '[' || _char == ',') {
+      retval = retval + newLine;
+
+      if (_char == '{' || _char == '[') {
+        pos = pos + 1;
+      }
+
+      for (var k=0; k<pos; k++) {
+        retval = retval + indentStr;
+      }
+    }
   }
 
-  module.exports = init;
+  return retval;
+
+}
+
+module.exports = init;

@@ -34,13 +34,14 @@ stdclass.extend(Origin, stdclass, {
     received: {},
     //记录总执行时间
     time: [],
-    hooks: []
+    hooks: [],
+    customs: {}
   },
 
   CONSIT: {
     MIME: {},
     //服务器超时10s
-    TIME_OUT: 10000,
+    TIME_OUT: 30000,
     bin: {},
     request: {}
   },
@@ -180,18 +181,19 @@ stdclass.extend(Origin, stdclass, {
   },
 
   _loadHook: function loadHook(name){
-    var hookRun = require('./' + name);
-    var len = this.get('len');
+    var hookRun  = require('./' + name);
+    var len      = this.get('len');
     var received = this.get('received');
-    var _files = this.get('_files');
-    var files = (_files[0] || this.get('files')).map(function(file){
+    var _files   = this.get('_files');
+    var files    = (_files[0] || this.get('files')).map(function(file){
       return received[file] ? false : file;
     });
 
     var hook = new hookRun({
-      path: this.get('path'), 
-      files: files,
-      maps: this.get('maps')
+      path    : this.get('path'),
+      files   : files,
+      customs : this.get('customs'),
+      maps    : this.get('maps')
     });
 
     var dataList = ['request', 'bin', 'data'];
