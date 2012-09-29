@@ -1,7 +1,7 @@
 {
   "port"     : 80,
   "dirIndex" : ["index.html", "index.htm"],
-  "www"      : "/Users/eward/Sites/",
+  "www"      : "/Users/eward/Sites/dev/",
 
   "groups":{
     "statics" : [".css",".js","imgs",".swf"],
@@ -12,15 +12,30 @@
     ".css":["less"],
     ".php":["php/tms", "php/proxy"]
   },
-  
+
   "servers":{
-     "market":{
-      "path":"/Users/eward/Sites/dev/"
+    "market":{
+      "path":"/Users/eward/Sites/dev/",
+      "maps":{
+        "/nongye/demo/ruzhu/assets/":{
+          "path": "/Users/eward/assets/nongye/",
+          "hooks": {
+            ".css": ["less"],
+            "statics": ["statics"]
+          }
+        }
+      }
+    },
+    "10.13.70.82": {
+      "equal": "market"
+    },
+    "hanwen.taobao.com": {
+      "equal": "market"
     },
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
       "customs": {
-          "proxy": ""
+        "proxy": ""
       },
       "maps":{
         "/tmse/5137/assets/":{
@@ -30,10 +45,11 @@
           }
         },
         "/p/market/": {
-            "path": "/Users/eward/deploy/market/",
-            "hooks": {
-                "statics" : ["statics"]
-            }
+          "disabled": 0,
+          "path": "/Users/eward/deploy/market/",
+          "hooks": {
+            "statics" : ["statics"]
+          }
         }
       },
       "hooks":{
@@ -46,31 +62,30 @@
     "vm":{
       "path":"/Users/eward/deploy/webapp/"
     },
-    
+
     "sdk":{
       "path":"/Users/eward/Sites/TSDK/",
       "hooks": {
-          "*": ["php/proxy"]
+        "*": ["php/proxy"]
       },
       "maps": {
-          "/assets/":{
-              "path": "{base}/sail/page/assets/",
-              "index": 0
-          }
+        "/assets/":{
+          "path": "{base}/sail/page/assets/",
+          "index": 0
+        }
       }
     },
-    
+
     "dpl":{
-        "path":"/Users/eward/Sites/dpl",
-        "hooks": {
-            "*": ["php/proxy"],
-            ".css": ["statics"]
-        },
-        "customs": {
-            "thread": 8
-        }
+      "path":"/Users/eward/Sites/dpl",
+      "hooks": {
+        "*": ["php/proxy"],
+        ".css": ["statics"]
+      },
+      "customs": {
+      }
     }
-    
+
   },
 
   "bin":{"php":"php"},

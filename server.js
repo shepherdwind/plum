@@ -172,7 +172,10 @@ Server.prototype = {
       var maps = serverConfig.maps || {};
       var mapPath = {};
       Object.keys(maps).forEach(function(key){
+
         var _map = maps[key];
+        if (_map['disabled']) return;
+
         var index = _map['index'];
         var _isHasMapedFile = false;
         var _files = files.map(function(file){
