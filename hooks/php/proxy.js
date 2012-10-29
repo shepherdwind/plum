@@ -39,7 +39,8 @@ stdclass.extend(Hook, stdclass, {
 
   CONSIT: {
     request: {},
-    data: []
+    data: [],
+    bin: {}
   },
 
   _init: function init(){
@@ -140,7 +141,8 @@ stdclass.extend(Hook, stdclass, {
       var argvs = ['-S','127.0.0.1:' + port];
       var rewriteFile = basePath + '/__route.php';
       if (existsSync(rewriteFile)) argvs.push('__route.php');
-      var _run = spawn('php', argvs, {cwd: basePath});
+      var phpCmd = this.get('bin')['php'];
+      var _run = spawn(phpCmd, argvs, {cwd: basePath});
 
       _run.stdout.on('data', function (data) {
         //console.log('stdout: ' + data);

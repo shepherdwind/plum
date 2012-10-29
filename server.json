@@ -1,7 +1,7 @@
 {
   "port"     : 80,
   "dirIndex" : ["index.html", "index.htm"],
-  "www"      : "/Users/eward/Sites/dev/",
+  "www"      : "/Users/eward/sites/",
 
   "groups":{
     "statics" : [".css",".js","imgs",".swf"],
@@ -26,7 +26,7 @@
         }
       }
     },
-    "10.13.70.82": {
+    "10.13.70.29": {
       "equal": "market"
     },
     "hanwen.taobao.com": {
@@ -35,20 +35,36 @@
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
       "customs": {
-        "proxy": ""
+        "proxy": "pre"
       },
       "maps":{
         "/tmse/5137/assets/":{
           "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
+          "disabled": 0,
           "hooks":{
+            ".css": ["statics"],
+            "statics" : ["statics"]
+          }
+        },
+        "/apps/nongye/":{
+          "path" : "/Users/eward/assets/nongye/",
+          "disabled": 0,
+          "hooks":{
+            ".css" : ["less"],
             "statics" : ["statics"]
           }
         },
         "/p/market/": {
           "disabled": 0,
-          "path": "/Users/eward/deploy/market/",
+          "path": "/Users/eward/assets/market/",
           "hooks": {
             "statics" : ["statics"]
+          }
+        },   
+        "/p/shop/outside/mods/": {
+          "path": "/Users/eward/assets/outside/mods/",
+          "hooks": {
+            "statics": ["statics"]
           }
         }
       },
@@ -59,30 +75,11 @@
     "assets.daily.taobao.net":{
       "equal":"a.tbcdn.cn"
     },
-    "vm":{
-      "path":"/Users/eward/deploy/webapp/"
-    },
-
-    "sdk":{
-      "path":"/Users/eward/Sites/TSDK/",
-      "hooks": {
-        "*": ["php/proxy"]
-      },
-      "maps": {
-        "/assets/":{
-          "path": "{base}/sail/page/assets/",
-          "index": 0
-        }
-      }
-    },
-
     "dpl":{
-      "path":"/Users/eward/Sites/dpl",
+      "path":"/Users/eward/sites/dpl",
       "hooks": {
         "*": ["php/proxy"],
         ".css": ["statics"]
-      },
-      "customs": {
       }
     }
 
@@ -91,14 +88,10 @@
   "bin":{"php":"php"},
 
   "logFiles":[
-    {
-      "path":"tmse/5137/assets",
-      "ext":[".js", ".css"]
-    },
-    {
+   {
       "path":"/nongye/",
-      "ext":[".css"]
-    }
+      "ext":[".css", ".js"]
+   }
   ],
   "logHooks" : ["less", "statics"],
   "logBasic" : false,
