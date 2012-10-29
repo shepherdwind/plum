@@ -142,6 +142,12 @@ stdclass.extend(Hook, stdclass, {
       var rewriteFile = basePath + '/__route.php';
       if (existsSync(rewriteFile)) argvs.push('__route.php');
       var phpCmd = this.get('bin')['php'];
+      //如果是相对路径
+      if (phpCmd.indexOf('.') > -1){
+        phpCmd = path.resolve(__dirname, path.dirname(phpCmd)) + 
+                 '/' + path.basename(phpCmd);
+      }
+
       var _run = spawn(phpCmd, argvs, {cwd: basePath});
 
       _run.stdout.on('data', function (data) {
