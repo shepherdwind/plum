@@ -20,7 +20,7 @@
         "/nongye/demo/ruzhu/assets/":{
           "path": "/Users/eward/assets/nongye/",
           "hooks": {
-            ".css": ["less"],
+            ".css": ["statics"],
             "statics": ["statics"]
           }
         }
@@ -35,12 +35,14 @@
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
       "customs": {
-        "proxy": "pre"
+        "proxy": "",
+        "hosts" : ["110.75.14.33", "218.108.242.251"],
+        "host"  : 1
       },
       "maps":{
         "/tmse/5137/assets/":{
           "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
-          "disabled": 0,
+          "disabled": 1,
           "hooks":{
             ".css": ["statics"],
             "statics" : ["statics"]
@@ -50,22 +52,30 @@
           "path" : "/Users/eward/assets/nongye/",
           "disabled": 0,
           "hooks":{
-            ".css" : ["less"],
+            ".css" : ["statics"],
             "statics" : ["statics"]
           }
         },
         "/p/market/": {
-          "disabled": 0,
+          "disabled": 1,
           "path": "/Users/eward/assets/market/",
           "hooks": {
             "statics" : ["statics"]
           }
         },   
-        "/p/shop/outside/mods/": {
+        "/p/shop/outside/mods/" : {
+          "disabled" : 0,
           "path": "/Users/eward/assets/outside/mods/",
           "hooks": {
             "statics": ["statics"]
           }
+        },
+        "/apps/brandservice/nongye/": {
+          "disabled": 0,
+            "path": "/Users/eward/assets/brandservice/nongye/",
+            "hooks": {
+                "statics": ["statics"]
+            }
         }
       },
       "hooks":{
@@ -74,6 +84,15 @@
     },
     "assets.daily.taobao.net":{
       "equal":"a.tbcdn.cn"
+    },
+    "assets.taobaocdn.com":{
+      "equal":"a.tbcdn.cn"
+    },
+    "tms.taobao.com": {
+      "customs": {"host": "110.75.19.81"},
+      "hooks" : {
+        "*" : ["agent"]
+      }
     },
     "dpl":{
       "path":"/Users/eward/sites/dpl",
@@ -87,13 +106,6 @@
 
   "bin":{"php":"php"},
 
-  "logFiles":[
-   {
-      "path":"/nongye/",
-      "ext":[".css", ".js"]
-   }
-  ],
-  "logHooks" : ["less", "statics"],
-  "logBasic" : false,
-  "debug"    : 0
+  "log": ["*.js"],
+  "debug" : 0
 }

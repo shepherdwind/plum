@@ -3,6 +3,8 @@
 基于node的Demo服务器。Node作为http请求控制中心，通过`server.json`配置，根据请求
 域名，找到所请求的文件，同时根据服务器配置的`hook`，对文件执行解析分发。
 
+[doc](http://git.shepherdwind.com/plum/)
+
 ##Use
   
       sudo npm install plum -g
@@ -58,6 +60,12 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
   数据源为a.tms.json，运行时，每个函数通过name来定位数据。
 
 ##change log
+
+- [2012-11-14 11:40:24] version 0.3.9
+  - 简化log判断，改为两条log输出规则，log和debug，log使用支持通配符`*`，匹配需要
+    输出log信息的url。debug打开所有的log信息
+  - 修复bug [#9](https://github.com/shepherdwind/plum/issues/9)
+  - 增加`agent`钩子，用于完全代理任意域名
 
 - [2012-08-09 08:44:24] version 0.3.1
   - 增加log信息过滤配置，logFiles配置可显示log信息的文件，logHooks配置hook日志,

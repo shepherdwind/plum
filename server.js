@@ -113,7 +113,6 @@ Server.prototype = {
     }
     //var hosts = config.servers;
 
-    //console.log(req.headers);
     if (!serverConfig){
       log('error', 'error', host + ' is not defined in the config.json');
       this.error({
@@ -200,6 +199,9 @@ Server.prototype = {
         }
 
       });
+      if (ext !== ALL_FILES && serverConfig.hooks[ALL_FILES]) {
+        hooks = hooks.concat(serverConfig.hooks[ALL_FILES]);
+      }
       //合并主配置
       hooks = hooks.concat(serverConfig['hooks'][ext] || []);
 
@@ -270,7 +272,7 @@ Server.prototype = {
       //超过20ms的信息log出来
       //if (hook.getSpendTime() > 20){
       hook.log.forEach(function(msg){
-        if (_this._shouldShow(msg)) {
+        if (_this._shouldShow(msg, req.headers.host)) {
           var level = 'info';
           if (msg.log.indexOf('reject') > -1) level = 'debug';
           log(msg.log, level, msg.msg || '');
@@ -284,28 +286,33 @@ Server.prototype = {
   },
 
   //是否在log信息中显示
-  _shouldShow: function(msg){
+  _shouldShow: function(msg, host){
     if (!config.debug){
-      if (msg.type == 'hook'){
-        var logHooks = config.logHooks || [];
-        var logFiles = config.logFiles || [];
-        var hook = msg.hook;
-        var file = msg.file;
-        var ext  = path.extname(file);
+      if (msg.type == 'hook' && config.log && config.log.length){
+        var ret = config.log.some(function(reg){
+          var url = host + msg.file;
+          var arr = reg.split('*');
+          var isFalse = false;
+          var index = 0;
 
-        if (logHooks.indexOf(hook) !== -1) {
-          return true;
-        } else {
-          return logFiles.some(function(fileDesc){
-            var isFile = file.indexOf(fileDesc.path) !== -1;
-            var isExt  = !fileDesc.ext || fileDesc.ext.indexOf(ext) !== -1;
-            return isFile && isExt;
+          arr.forEach(function(str){
+
+            var i = url.indexOf(str, index);
+            if (isFalse || !str) return;
+
+            if ( i > -1) {
+              index = i + str.length;
+            } else {
+              isFalse = true;
+            }
+
           });
-        }
 
-      } else if(config.logBasic){
-        return true;
-      }
+          return !isFalse;
+        });
+
+        return ret;
+      } 
     } else {
       return true;
     }
@@ -457,7 +464,7 @@ Server.prototype = {
       files = files.split(',');
 
       files.forEach(function (file) {
-        var _url = base + file;
+        var _url = base + '/' + file;
         ret.push(_url.replace('//', '/'));
       });
     } else {

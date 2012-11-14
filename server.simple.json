@@ -1,0 +1,34 @@
+{
+  "port"     : 80,
+  "dirIndex" : ["index.html", "index.htm"],
+  "www"      : "/Users/eward/sites/",
+
+  "groups":{
+    "statics" : [".css",".js","imgs",".swf"],
+    "imgs"    : [".png", ".gif", ".jpg", ".ico"]
+  },
+
+  "hooks":{
+    ".css":["less"],
+    ".php":["php/tms", "php/proxy"]
+  },
+
+  "servers":{
+    "market":{
+      "path":"/Users/eward/Sites/dev/",
+      "maps":{
+        "/nongye/demo/ruzhu/assets/":{
+          "path": "/Users/eward/assets/nongye/",
+          "hooks": {
+            ".css": ["statics"],
+            "statics": ["statics"]
+          }
+        }
+      }
+    }
+  },
+
+  "log": ["*5137"],
+  "bin"   : {"php":"php"},
+  "debug" : 0
+}
