@@ -26,7 +26,7 @@
         }
       }
     },
-    "10.13.70.29": {
+    "10.7.58.208": {
       "equal": "market"
     },
     "hanwen.taobao.com": {
@@ -107,5 +107,5 @@
   "bin":{"php":"php"},
 
   "log": ["*.js"],
-  "debug" : 0
+  "debug" : 1
 }

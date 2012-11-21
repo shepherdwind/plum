@@ -465,7 +465,7 @@ Server.prototype = {
 
       files.forEach(function (file) {
         var _url = base + '/' + file;
-        ret.push(_url.replace('//', '/'));
+        ret.push(_url.replace(/\/+/g, '/'));
       });
     } else {
       url = url.split('?')[0];

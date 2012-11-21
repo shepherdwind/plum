@@ -61,6 +61,8 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
 
 ##change log
 
+- version 0.3.10
+  - 修复两个斜杠开头时代理错误的bug
 - [2012-11-14 11:40:24] version 0.3.9
   - 简化log判断，改为两条log输出规则，log和debug，log使用支持通配符`*`，匹配需要
     输出log信息的url。debug打开所有的log信息
