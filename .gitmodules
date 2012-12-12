@@ -1,0 +1,3 @@
+[submodule "node_modules/velocity.js"]
+	path = node_modules/velocity.js
+	url = git@github.com:shepherdwind/velocity.js.git
