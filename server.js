@@ -156,6 +156,7 @@ Server.prototype = {
       data: this.data,
       time: []
     };
+
     this.hook(cfg);
 
     var type = this.get('type');
@@ -176,6 +177,7 @@ Server.prototype = {
         if (_map['disabled']) return;
 
         var index = _map['index'];
+        var isDebug = _map['debug'];
         var _isHasMapedFile = false;
         var _files = files.map(function(file){
           var _index = file.indexOf(key);
@@ -184,6 +186,11 @@ Server.prototype = {
             //如果存在路径映射
             if (_map.path) mapPath[file] = file.replace(key, _map.path);
             mapPath[file] = mapPath[file].replace('{base}', serverConfig['path']);
+
+            if (isDebug) {
+              mapPath[file] = mapPath[file].replace(/-min\.(js|css)$/, '.$1');
+            }
+
             _isHasMapedFile = true;
             return file;
           } else {
@@ -473,6 +480,13 @@ Server.prototype = {
       ret.push(url);
     }
 
+    // 去除重复
+    var _o = {};
+    ret.forEach(function(file){
+      _o[file] = 1;
+    });
+    ret = Object.keys(_o);
+
     return ret;
   }//}}}
 
@@ -511,46 +525,6 @@ function setStatus(req, res, file, version){
 
     getStatus(req, res, json, message, version);
   });
-}
-
-function formatJson(val) {
-  var retval = '';
-  var str = val.replace(/[\n\r\s]+/g, '');
-  var pos = 0;
-  var strLen = str.length;
-  var indentStr = '  ';
-  var newLine = "\n";
-  var _char = '';
-
-  for (var i=0; i<strLen; i++) {
-    _char = str.substring(i,i+1);
-
-    if (_char == '}' || _char == ']') {
-      retval = retval + newLine;
-      pos = pos - 1;
-
-      for (var j=0; j<pos; j++) {
-        retval = retval + indentStr;
-      }
-    }
-
-    retval = retval + _char;	
-
-    if (_char == '{' || _char == '[' || _char == ',') {
-      retval = retval + newLine;
-
-      if (_char == '{' || _char == '[') {
-        pos = pos + 1;
-      }
-
-      for (var k=0; k<pos; k++) {
-        retval = retval + indentStr;
-      }
-    }
-  }
-
-  return retval;
-
 }
 
 module.exports = init;

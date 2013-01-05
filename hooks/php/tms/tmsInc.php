@@ -10,7 +10,13 @@ function tmsInc($file, $isSyntax, $isBuild){
     global $json_file, $html_file, $jsonData, $createFile;
     $json_file = str_replace('.php', '.json', $file);
     $html_file = str_replace('.php', '.html', $file);
-    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . dirname($file) . '/');
+    $file = str_replace('\\', '/', $file);
+    //$filedirs = explode('/', dirname($file));
+    //var_export($filedirs);
+    chdir(dirname($file));
+    //上升一个路径
+    $parentDir = realpath('../');
+    ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . $parentDir . '/');
 
     if (file_exists($json_file)){
         $jsonData = tb_json_decode(@file_get_contents($json_file), true);

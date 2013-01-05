@@ -10,10 +10,17 @@
 
   "hooks":{
     ".css":["less"],
+    ".htm": ["velocity"],
     ".php":["php/tms", "php/proxy"]
   },
 
   "servers":{
+    "localhost": {
+      "path" : "/Users/eward/code/"   
+    },
+    "code" : {
+      "equal": "localhost"
+    },
     "market":{
       "path":"/Users/eward/Sites/dev/",
       "maps":{
@@ -26,23 +33,24 @@
         }
       }
     },
-    "10.7.58.208": {
-      "equal": "market"
+    "192.168.1.14": {
+      "equal": "localhost"
     },
+    
     "hanwen.taobao.com": {
       "equal": "market"
     },
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
       "customs": {
-        "proxy": "",
+        "proxy": "pre",
         "hosts" : ["110.75.14.33", "218.108.242.251"],
         "host"  : 1
       },
       "maps":{
         "/tmse/5137/assets/":{
           "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
-          "disabled": 1,
+          "disabled": 0,
           "hooks":{
             ".css": ["statics"],
             "statics" : ["statics"]
@@ -56,26 +64,28 @@
             "statics" : ["statics"]
           }
         },
-        "/p/market/": {
-          "disabled": 1,
-          "path": "/Users/eward/assets/market/",
+        "/apps/brandservice/": {
+          "disabled": 0,
+          "path": "/Users/eward/assets/brandservice/",
           "hooks": {
             "statics" : ["statics"]
           }
         },   
-        "/p/shop/outside/mods/" : {
+        "/p/market/nongye/detail/20121220/" : {
           "disabled" : 0,
-          "path": "/Users/eward/assets/outside/mods/",
+          "debug" : 1,
+          "path": "/Users/eward/assets/market/nongye/detail/src/",
           "hooks": {
             "statics": ["statics"]
           }
         },
-        "/apps/brandservice/nongye/": {
+        "/p/detail/20121213/": {
           "disabled": 0,
-            "path": "/Users/eward/assets/brandservice/nongye/",
-            "hooks": {
-                "statics": ["statics"]
-            }
+          "path": "/Users/eward/assets/detail/20121213/",
+          "debug": 1,
+          "hooks": {
+            "statics": ["statics"]
+          }
         }
       },
       "hooks":{
@@ -106,6 +116,6 @@
 
   "bin":{"php":"php"},
 
-  "log": ["*.js"],
-  "debug" : 1
+  "log": ["*nongye*"],
+  "debug" : 0
 }
