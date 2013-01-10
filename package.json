@@ -4,8 +4,12 @@
   "keywords"      : ["less", "server", "proxy", "tms"],
   "author"        : "Eward Song<hanwen.sah@taobao.com>",
   "contributors"  : [],
-  "version"       : "0.4.0",
+  "version"       : "0.4.1",
   "bin"           : { "plum": "./bin/plum" },
   "main"          : "./server",
-  "engines"       : { "node": ">=0.8.0" }
+  "engines"       : { "node": ">=0.8.0" },
+  "dependencies"  : {
+    "less" : ">=1.3",
+    "velocity.js" : ">=0.2.0"
+  }
 }

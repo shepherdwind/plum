@@ -45,7 +45,8 @@
       "customs": {
         "proxy": "pre",
         "hosts" : ["110.75.14.33", "218.108.242.251"],
-        "host"  : 1
+        "host"  : 1,
+        "debug" : 1
       },
       "maps":{
         "/tmse/5137/assets/":{
@@ -58,7 +59,7 @@
         },
         "/apps/nongye/":{
           "path" : "/Users/eward/assets/nongye/",
-          "disabled": 0,
+          "disabled": 1,
           "hooks":{
             ".css" : ["statics"],
             "statics" : ["statics"]
@@ -67,25 +68,34 @@
         "/apps/brandservice/": {
           "disabled": 0,
           "path": "/Users/eward/assets/brandservice/",
-          "hooks": {
-            "statics" : ["statics"]
-          }
+          "hooks": { "statics" : ["statics"] }
         },   
         "/p/market/nongye/detail/20121220/" : {
           "disabled" : 0,
           "debug" : 1,
           "path": "/Users/eward/assets/market/nongye/detail/src/",
-          "hooks": {
-            "statics": ["statics"]
-          }
+          "hooks": { "statics": ["statics"] }
+        },
+        "/p/market/2011/": {
+          "path": "/Users/eward/assets/market/2011/",
+          "hooks": { "statics": ["statics"] }
+        },
+        "/p/global/1.0/": {
+          "path" : "/Users/eward/assets/global/",
+          "debug" : 1,
+          "disabled" : 0,
+          "hooks": { "statics": ["statics"] }
+        },
+        "/p/shop/outside/": {
+          "debug" : 1,
+          "path"  : "/Users/eward/assets/outside/", 
+          "hooks": { "statics": ["statics"] }
         },
         "/p/detail/20121213/": {
           "disabled": 0,
           "path": "/Users/eward/assets/detail/20121213/",
           "debug": 1,
-          "hooks": {
-            "statics": ["statics"]
-          }
+          "hooks": { "statics": ["statics"] }
         }
       },
       "hooks":{
