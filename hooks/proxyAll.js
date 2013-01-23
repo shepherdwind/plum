@@ -120,6 +120,7 @@ stdclass.extend(Proxy, stdclass, {
 
     var self = this;
     var ret = [];
+    var time = Date.now();
 
     http.get({
       headers: {
@@ -135,7 +136,7 @@ stdclass.extend(Proxy, stdclass, {
       });
 
       res.on('end', function(){
-        self.fire('end', {index: i});
+        self.fire('end', {index: i, time: '/' + (Date.now() - time) + 'ms'});
       });
 
     }).on('error', function(e){

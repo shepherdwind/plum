@@ -211,9 +211,10 @@ stdclass.extend(Origin, stdclass, {
     }, this);
 
     hook.on('end', function(e){
+      var netTime = e.time;
       this.log.push({
         log: 'Hook ' + name,
-        msg: 'Get file ' + files[e.index] + '('+ e.index +'). spend time:' + this._getTime(),
+        msg: 'Get file ' + files[e.index] + '('+ e.index +'). spend time:' + this._getTime() + (e.time || ''),
         type: 'hook',
         file: files[e.index],
         hook: name
