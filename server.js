@@ -266,10 +266,11 @@ Server.prototype = {
       for (var x in e.headers){
         HEADER[x] = e.headers[x];
       }
+      console.log('header:set');
     }, this);
 
     hook.once('data', function(){
-      HEADER['Content-Type'] = this.get('type');
+      HEADER['Content-Type'] = HEADER['Content-Type'] || this.get('type');
       res.writeHead(STATUS_CODE, HEADER);
     }, this);
     hook.on('data', this.success, this);

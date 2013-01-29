@@ -204,6 +204,7 @@ stdclass.extend(Hook, stdclass, {
         _headers[toUper(x)] = res.headers[x];
       }
       self.fire('set:header', {headers: _headers, code: res['statusCode']});
+
       res.on('data', function(data){
         self.fire('data', {data: data, index: i});
       });
