@@ -266,7 +266,6 @@ Server.prototype = {
       for (var x in e.headers){
         HEADER[x] = e.headers[x];
       }
-      console.log('header:set');
     }, this);
 
     hook.once('data', function(){
