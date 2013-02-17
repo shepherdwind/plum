@@ -1,6 +1,9 @@
-[submodule "node_modules/velocity.js"]
-	path = node_modules/velocity.js
-	url = git@github.com:shepherdwind/velocity.js.git
+[submodule "node_modules/velocityjs"]
+	path = node_modules/velocityjs
+	url = git://github.com/shepherdwind/velocity.js.git
 [submodule "node_modules/less"]
 	path = node_modules/less
 	url = git://github.com/cloudhead/less.js.git
+[submodule "node_modules/iconv-lite"]
+  path = node_modules/iconv-lite
+  url = git://github.com/ashtuchkin/iconv-lite.git

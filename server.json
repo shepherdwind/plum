@@ -18,9 +18,7 @@
         "/tmse/5137/assets/":{
           "path" : "/Users/eward/Sites/dev/nongye/sdk/assets/",
           "disabled": 0,
-          "hooks":{
-            "statics" : ["statics"]
-          }
+          "hooks":{ "statics" : ["statics"] }
         },
         "/apps/nongye/":{
           "path" : "/Users/eward/assets/nongye/",
@@ -48,9 +46,6 @@
     "market":{
       "path":"/Users/eward/Sites/dev/"
     },
-    "192.168.1.14": {
-      "equal": "localhost"
-    },
     "hanwen.taobao.com": {
       "equal": "market"
     },
@@ -62,9 +57,11 @@
     },
     "tms.taobao.com": {
       "customs": {"host": "110.75.19.81"},
-      "hooks" : {
-        "*" : ["agent"]
-      }
+      "hooks" : { "*" : ["agent"] }
+    },
+    "nongye": {
+      "path": "/Users/eward/assets/nongy-vm/",
+      "hooks": {".htm": ["webx"] }
     },
     "dpl":{
       "path":"/Users/eward/sites/dpl",

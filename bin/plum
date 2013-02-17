@@ -16,7 +16,7 @@ function getVersion(cb){
       rets += data.toString();
     });
     ret.on('end', function(){
-      cb(JSON.parse(rets).version);
+      cb(JSON.parse(rets));
     });
   }).on('error', function(e){
     console.log(e);
@@ -33,11 +33,23 @@ fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
     ', server is running.\nPress key ctrl and c to quit!\nconfig url is ' +
     '127.0.0.1/config');
 
-  getVersion(function(version){
+  getVersion(function(json){
+    var version = json.version;
     if (version > config.version){
+
+      var updateInfo = json.update || [];
+
+      if (json.update) {
+        updateInfo = updateInfo[version];
+      }
+
       setInterval(function(){
         console.log( red + 
           'the newest version is ' + version + ', pleace update !!' + reset);
+        updateInfo.forEach(function(info, i){
+          console.log('' + i + ': '+ info);
+        });
+
       }, 100000)
     }
   });
