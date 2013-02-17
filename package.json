@@ -4,7 +4,7 @@
   "keywords"      : ["less", "server", "proxy", "tms"],
   "author"        : "Eward Song<hanwen.sah@taobao.com>",
   "contributors"  : [],
-  "version"       : "0.4.1",
+  "version"       : "0.4.2",
   "bin"           : { "plum": "./bin/plum" },
   "main"          : "./server",
   "engines"       : { "node": ">=0.8.0" },
@@ -14,6 +14,6 @@
     "iconv-lite" : ">=0.2.7"
   },
   "updates": {
-    "0.4.1": ["增加webx规则", "增加更新说明"]
+    "0.4.2": ["增加webx规则", "增加更新说明"]
   }
 }

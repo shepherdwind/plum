@@ -37,20 +37,18 @@ fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
     var version = json.version;
     if (version > config.version){
 
-      var updateInfo = json.update || [];
+      var updateInfo = json.updates || [];
 
-      if (json.update) {
+      if (json.updates) {
         updateInfo = updateInfo[version];
       }
 
-      setInterval(function(){
-        console.log( red + 
-          'the newest version is ' + version + ', pleace update !!' + reset);
-        updateInfo.forEach(function(info, i){
-          console.log('' + i + ': '+ info);
-        });
+      console.log( red + 
+        'the newest version is ' + version + ', pleace update !!' + reset);
+      updateInfo.forEach(function(info, i){
+        console.log('' + (i + 1) + '. '+ info);
+      });
 
-      }, 100000)
     }
   });
 
