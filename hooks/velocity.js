@@ -3,7 +3,7 @@ var stdclass = require('../lib/stdclass');
 var path = require('path');
 var fs = require('fs');
 var exists = fs.exists || path.exists;
-var Velocity = require('velocity.js');
+var Velocity = require('velocityjs');
 var URL      = require('url');
 
 function Hook(){
@@ -43,7 +43,7 @@ stdclass.extend(Hook, stdclass, {
 
       if (file === false) return this._add();
 
-      var basePath = this.get('path');
+      var basePath = this.get('path') + path.dirname(file) + '/';
       var basename = path.basename(file).replace(/\.html{0,1}$/, '');
       var filePath = basePath + basename + '.vm';
       exists(filePath, this._do.bind(this, file, filePath, i));
