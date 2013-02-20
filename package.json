@@ -4,17 +4,18 @@
   "keywords"      : ["less", "server", "proxy", "tms"],
   "author"        : "Eward Song<hanwen.sah@taobao.com>",
   "contributors"  : [],
-  "version"       : "0.4.2-1",
+  "version"       : "0.4.3",
   "bin"           : { "plum": "./bin/plum" },
   "main"          : "./server",
   "engines"       : { "node": ">=0.8.0" },
   "dependencies"  : {
     "less"       : ">=1.3",
-    "velocityjs" : ">=0.2.0",
+    "velocityjs" : ">=0.3.6",
     "iconv-lite" : ">=0.2.7"
   },
   "updates": {
     "0.4.2": ["增加webx规则", "增加更新说明"],
-    "0.4.2-1": ["增加webx规则", "修复velocity规则路径问题"]
+    "0.4.2-1": ["增加webx规则", "修复velocity规则路径问题"],
+    "0.4.3": ["webx规则增加?jsonify输出数据结构", "修改文档，增加webx规则使用文档", "velocityjs版本更新"],
   }
 }

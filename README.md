@@ -26,6 +26,21 @@
 [文档](https://github.com/shepherdwind/plum/blob/master/hooks/README.md)。
 server.js是入口文件，完成请求分发工作。主要解析过程由hooks目录下的js执行。
 
+- webx [from 0.4.2]
+  
+  webx规则，使用规则请看[issue 11](https://github.com/shepherdwind/plum/issues/11) 。
+
+- *velocity* [from 0.4.1]， 使用velocity模板解析。
+  
+- *agent* 请求转发到另外域名，配置如下
+
+```json
+    "tms.taobao.com": {
+      "customs": {"host": "110.75.19.81", "port": 80},
+      "hooks" : { "*" : ["agent"] }
+    }
+```
+
 - *origin*
 
   origin首先判断请求为文件还是目录，如果是目录，生成目录列表。如果是文件，根据文
@@ -40,12 +55,16 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
 
   less完成less解析工作，初始化时，判断文件相对应的less文件是否存在，如果存在执行
   less编译，返回结果，如果不存在，退出，交给origin处理。
+  
+- *proxyAll* 对所有的文件都转发到服务器端取文件，淘宝静态资源代理规则。
 
 - *proxy*
 
   淘宝cdn代理实现。初始化时候，首先判断文件在本地是否存在(文件查找规则由请求url
   和 server.json配置的path决定)，如果不存在，从cdn服务器获取数据。如果存在，则退
   出，origin处理自动。
+  
+- *php/proxy* 启动php自带的server，需要php v5.4.x，完整支持post、get请求
 
 - *php/cli*
 
@@ -111,8 +130,3 @@ server.js是入口文件，完成请求分发工作。主要解析过程由hooks
   - 去除tms规则下，引用模块文件名必须以`.tms.php`结尾的规则
   - tms规则下，自动生成.json文件，方便修改
   - 增加自动更新提示
-
-##TODO
-
-- php使用php-cgi和fpm来执行。对fpm和php-cgi不是很了解，学习中。
-- vm模板解析

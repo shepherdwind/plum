@@ -68,6 +68,7 @@ stdclass.extend(Hook, stdclass, {
     var request = this.get('request');
     var url = URL.parse(request.url, true);
     var isParse = '__parse' in url.query;
+    var isJsonify = 'jsonify' in url.query;
 
     //接受处理
     this.fire('receive', {file: file, index: i});
@@ -82,6 +83,7 @@ stdclass.extend(Hook, stdclass, {
       var str = (new webx({
         filePath: filePath,
         isParse: isParse,
+        isJsonify: isJsonify,
         basePath: this.get('path'),
         file : file
       })).parse();

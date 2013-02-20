@@ -1,7 +1,7 @@
 {
 
   "log": ["*5137*"],
-  "debug" : 0,
+  "debug" : 1,
   "servers":{
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",
@@ -60,7 +60,7 @@
       "hooks" : { "*" : ["agent"] }
     },
     "nongye": {
-      "path": "/Users/eward/assets/nongy-vm/",
+      "path": "/Users/eward/sites/nongye/templates/",
       "hooks": {".htm": ["webx"] }
     },
     "dpl":{

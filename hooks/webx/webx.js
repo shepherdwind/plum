@@ -75,7 +75,8 @@ stdclass.extend(Webx, stdclass, {
       macrosStr += Iconv.decode(fs.readFileSync(basePath + file), 'gbk');
     });
 
-    this.globalMacros = Velocity.Parser.parse(macrosStr);
+    var isJsonify = this.get('isJsonify');
+    this.globalMacros = isJsonify? macrosStr: Velocity.Parser.parse(macrosStr);
 
   },
 
@@ -108,6 +109,7 @@ stdclass.extend(Webx, stdclass, {
     var vm = Iconv.decode(fs.readFileSync(filePath), 'gbk');
     var str = '';
     var isParse = this.get('isParse');
+    var isJsonify = this.get('isJsonify');
     var file = this.get('file').replace('.htm', '.js');
     var context = this.getContext(file);
     var basePath = this.get('basePath');
@@ -119,6 +121,10 @@ stdclass.extend(Webx, stdclass, {
       if (isParse) {
 
         str = JSON.stringify(html, false, 2);
+
+      } else if (isJsonify) {
+
+        str = this.jsonify(vm);
 
       } else {
 
@@ -139,7 +145,23 @@ stdclass.extend(Webx, stdclass, {
     }
   },
 
-  layout: function(context){
+  jsonify: function(vm){
+
+    var vmLayout = this._getLayoutString();
+    vm = vmLayout.replace(/\$screen_placeholder/, vm);
+    vm = this.globalMacros + vm;
+
+    var context = {
+      control: this.tools.control
+    };
+
+    var asts = Velocity.Parser.parse(vm);
+    var jsonify = new Velocity.Jsonify(asts, context);
+    return (jsonify.toVTL());
+
+  },
+
+  _getLayoutString: function(){
 
     var file      = this.get('file');
     var basePath  = this.get('basePath');
@@ -148,6 +170,13 @@ stdclass.extend(Webx, stdclass, {
     var vm = Iconv.decode(fs.readFileSync(layout), 'gbk');
     vm = PARSE_GLOBAL_MACROS + vm;
 
+    return vm;
+
+  },
+
+  layout: function(context){
+
+    var vm = this._getLayoutString();
     var macros = this.globalMacros;
 
     return Velocity.render(vm, context, getMacros(macros));
