@@ -7,3 +7,6 @@
 [submodule "node_modules/iconv-lite"]
   path = node_modules/iconv-lite
   url = git://github.com/ashtuchkin/iconv-lite.git
+[submodule "node_modules/osenv"]
+	path = node_modules/osenv
+	url = git@github.com:isaacs/osenv.git

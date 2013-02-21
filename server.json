@@ -1,7 +1,7 @@
 {
 
   "log": ["*5137*"],
-  "debug" : 1,
+  "debug" : 0,
   "servers":{
     "a.tbcdn.cn":{
       "path":"/Users/eward/assets",

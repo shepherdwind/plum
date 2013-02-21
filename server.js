@@ -14,15 +14,34 @@ var log         = require('./lib/logger').log;
 var config;
 var MIME;
 var ALL_FILES   = '*';
+var osenv = require('osenv');
+
+function getConfigFilePath(){
+
+  var home = osenv.home();
+  var filePath = path.join(home, '.plum.json');
+
+  // 如果文件不存在，从其他路径copy过去
+  if (!existsSync(filePath)) {
+
+    var configPath = path.resolve(__dirname, '../') + '/server.json';
+
+    if (!existsSync(configPath)){
+      configPath = __dirname + '/server.json';
+    }
+
+    fs.writeFileSync(filePath, fs.readFileSync(configPath));
+  }
+
+  log('plum', 'info', 'config file path is ' + filePath);
+  return filePath;
+}
 
 function init(version){
   /**
    * 入口，读取配置文件
    */
-  var configPath = path.resolve(__dirname, '../') + '/server.json';
-  if (!existsSync(configPath)){
-    configPath = __dirname + '/server.json';
-  }
+  var configPath = getConfigFilePath();
 
   fs.readFile(configPath, 'utf-8', function(err, json){
 
