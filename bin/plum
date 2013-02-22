@@ -34,19 +34,28 @@ fs.readFile( __dirname + '/../package.json', 'utf-8', function(err, json){
     '127.0.0.1/config');
 
   getVersion(function(json){
+
     var version = json.version;
+
     if (version > config.version){
 
-      var updateInfo = json.updates || [];
-
-      if (json.updates) {
-        updateInfo = updateInfo[version];
-      }
-
+      console.log();
       console.log( red + 
         'the newest version is ' + version + ', pleace update !!' + reset);
-      updateInfo.forEach(function(info, i){
-        console.log('' + (i + 1) + '. '+ info);
+
+      if (!json.updates) return;
+
+      console.log('更新信息：');
+      console.log();
+      Object.keys(json.updates).forEach(function(v){
+        if (v > config.version) {
+          var updateInfo = json.updates[v];
+          console.log("Version " + v + ":");
+          updateInfo.forEach(function(info, i){
+            console.log('  ' + (i + 1) + '. '+ info);
+          });
+          console.log();
+        }
       });
 
     }

@@ -297,6 +297,7 @@ Server.prototype = {
       res.end();
       //超过20ms的信息log出来
       //if (hook.getSpendTime() > 20){
+      console.log();
       hook.log.forEach(function(msg){
         if (_this._shouldShow(msg, req.headers.host)) {
           var level = 'info';

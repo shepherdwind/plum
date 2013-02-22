@@ -56,11 +56,16 @@ stdclass.extend(Webx, stdclass, {
     var toolsPath = compoment.tools;
     var basePath = this.get('basePath');
 
-    var tools = require(basePath + toolsPath);
+    try {
 
-    tools = utils.mixin(tools, defaultTools(basePath, compoment['common-file-maps']));
+      var tools = require(basePath + toolsPath);
+      tools = utils.mixin(tools || {}, defaultTools(basePath, compoment['common-file-maps']));
 
-    this.tools = tools;
+      this.tools = tools;
+
+    } catch(e) {
+      this.tools = {};
+    }
 
   },
 
@@ -71,12 +76,16 @@ stdclass.extend(Webx, stdclass, {
     var basePath  = this.get('basePath');
 
     var macrosStr = '';
-    macros.forEach(function(file){
-      macrosStr += Iconv.decode(fs.readFileSync(basePath + file), 'gbk');
-    });
+    if (utils.isArray(macros)) {
+      macros.forEach(function(file){
+        macrosStr += Iconv.decode(fs.readFileSync(basePath + file), 'gbk');
+      });
 
-    var isJsonify = this.get('isJsonify');
-    this.globalMacros = isJsonify? macrosStr: Velocity.Parser.parse(macrosStr);
+      var isJsonify = this.get('isJsonify');
+      this.globalMacros = isJsonify? macrosStr: Velocity.Parser.parse(macrosStr);
+    } else {
+      this.globalMacros = isJsonify? macrosStr: [];
+    }
 
   },
 
