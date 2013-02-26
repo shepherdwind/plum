@@ -124,6 +124,10 @@ Server.prototype = {
     var refer = req.headers.referer;
     var serverConfig = this.getServerConfig(host, refer);
     var url = URL.parse(req.url).path;
+
+    url = url.replace(/\/+/g, '/').replace(/\\+/g, '/');
+    // see issue #10
+    url = getComboProp(serverConfig, url);
     var files = this.parse(url);
     var ext = path.extname(files[0]);
     if (url === '/favicon.ico') {
@@ -476,7 +480,6 @@ Server.prototype = {
    */
   parse: function(url){//{{{
     var ret = [];
-    url.replace('\\', '/');
 
     var combo = url.indexOf('??');
     var base, files;
@@ -545,6 +548,25 @@ function setStatus(req, res, file, version){
 
     getStatus(req, res, json, message, version);
   });
+}
+
+function getComboProp(config, url){
+  var customs = config.customs;
+  var comboPath = customs && customs['combo'];
+
+  if (comboPath && fs.existsSync(comboPath)) {
+    var combos = (fs.readFileSync(comboPath)).toString();
+    combos = combos.split("\n");
+    combos.forEach(function(combo){
+      combo = combo.replace(/(\s+)|\{baseUrl\}/g, '');
+      var parts = combo.split('=');
+      if (parts[0] == url) {
+        url = parts[1];
+      }
+    });
+  }
+
+  return url
 }
 
 module.exports = init;
