@@ -4,7 +4,7 @@
   "keywords"      : ["less", "server", "proxy", "tms"],
   "author"        : "Eward Song<hanwen.sah@taobao.com>",
   "contributors"  : [],
-  "version"       : "0.4.5",
+  "version"       : "0.4.6",
   "bin"           : { "plum": "./bin/plum" },
   "main"          : "./server",
   "engines"       : { "node": ">=0.8.0" },
@@ -21,6 +21,7 @@
     "0.4.3-1": ["配置文件默认位置修改为$HOME/.plum.json，防止更新导致配置被覆盖的悲剧(对原来不影响)。"],
     "0.4.3-2": ["防止webx.json配置不完整情况下的报错情况", "log信息分组"],
     "0.4.4": ["webx规则使用tms规则解析后缀是php的文件", "tms规则增加全局变量$TMS_LOCAL，区分本地环境和线上环境"],
-    "0.4.5": ["增加combo.properties配置，see #10", "修复url问题"]
+    "0.4.5": ["增加combo.properties配置，see #10", "修复url问题"],
+    "0.4.6": ["combo.properties配置支持combo和时间戳，see #10", "velocityjs升级到0.3.7"]
   }
 }

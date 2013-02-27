@@ -127,8 +127,17 @@ Server.prototype = {
 
     url = url.replace(/\/+/g, '/').replace(/\\+/g, '/');
     // see issue #10
-    url = getComboProp(serverConfig, url);
-    var files = this.parse(url);
+    var urls = this.parse(url);
+
+    var files = [];
+    urls.forEach(function(file){
+      var combo = getComboProp(serverConfig, file);
+      if (combo !== file) {
+        var file = self.parse(combo);
+      }
+      files = files.concat(file);
+    });
+
     var ext = path.extname(files[0]);
     if (url === '/favicon.ico') {
       res.end();
@@ -301,7 +310,6 @@ Server.prototype = {
       res.end();
       //超过20ms的信息log出来
       //if (hook.getSpendTime() > 20){
-      console.log();
       hook.log.forEach(function(msg){
         if (_this._shouldShow(msg, req.headers.host)) {
           var level = 'info';
