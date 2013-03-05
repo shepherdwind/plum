@@ -6,6 +6,14 @@ var phpCmd = 'php';
 var TMS_PATH = path.join(__dirname, '../php/tms/tms.php');
 
 function tmsVM(file){
+
+  var htmFile = file.replace(/.php$/, '.htm');
+
+  if (fs.existsSync(htmFile)) {
+    var size = fs.statSync(htmFile).size;
+    if (size > 0) return;
+  }
+
   var cmd = spawn(phpCmd, [TMS_PATH, file]);
   var ret = [];
   cmd.stdout.on('data', function cmdSuccess(data){
