@@ -10,6 +10,7 @@ var configStr   = '';
 var existsSync  = fs.existsSync || path.existsSync;
 var URL         = require('url');
 var cjson       = require('./lib/cjson');
+var utils = require('./lib/utils');
 var log         = require('./lib/logger').log;
 var config;
 var MIME;
@@ -238,7 +239,7 @@ Server.prototype = {
         }
 
       });
-      if (ext !== ALL_FILES && serverConfig.hooks[ALL_FILES]) {
+      if (!ext && serverConfig.hooks[ALL_FILES]) {
         hooks = hooks.concat(serverConfig.hooks[ALL_FILES]);
       }
       //合并主配置
