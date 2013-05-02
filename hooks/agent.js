@@ -83,8 +83,9 @@ stdclass.extend(Hook, stdclass, {
       return parts.join('-');
     }
 
+    headers.Host = host;
     var proxyServer = http.request({
-      host    : host || 'localhost',
+      host    : host,
       port    : port || 80,
       method  : request.method,
       headers : headers,
@@ -96,13 +97,19 @@ stdclass.extend(Hook, stdclass, {
       for(var x in res.headers){
         _headers[toUper(x)] = res.headers[x];
       }
+
       self.fire('set:header', {headers: _headers, code: res['statusCode']});
+
       res.on('data', function(data){
         self.fire('data', {data: data, index: i});
       });
 
       res.on('end', function(){
         self.fire('end', {index: i});
+      });
+
+      res.on('error', function(){
+        console.log('error');
       });
 
     });

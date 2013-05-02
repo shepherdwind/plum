@@ -53,7 +53,7 @@ function repeatReplace ($file)
         ob_start();
         $phpContent = preg_replace('/_tms_repeat_begin\((?:.+?)row["\']\s*\:\s*[\'"]([^\'"]+)[\'"]?(?:[^\)]+)\)\s*\;?/',"for (\$_i_tms = 0; \$_i_tms < $1; \$_i_tms++) {", $phpContent);
         $phpContent = preg_replace('/_tms_repeat_end\(\s*\)\;?/i','}',$phpContent);
-        eval('?>'.$phpContent.'<?');
+        eval('?>'.$phpContent.'<?php');
         file_put_contents($html_file, ob_get_contents());
         chmod($html_file, 0755);
         ob_end_clean();
@@ -62,7 +62,7 @@ function repeatReplace ($file)
     {
         $phpContent = preg_replace('/_tms_repeat_begin\((?:.+?)row["\']\s*\:\s*[\'"]([^\'"]+)[\'"]?(?:[^\)]+)\)\s*\;?/',"for (\$_i_tms = 0; \$_i_tms < $1; \$_i_tms++) {", $phpContent);
         $phpContent = preg_replace('/_tms_repeat_end\(\s*\)\;?/i','}',$phpContent);
-        eval('?>'.$phpContent.'<?');
+        eval('?>'.$phpContent);
     }
 
     if ($createFile){

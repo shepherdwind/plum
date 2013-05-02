@@ -151,7 +151,6 @@ stdclass.extend(Hook, stdclass, {
       //var osenv = require('osenv');
       var options = {cwd: basePath};
       if (process.env.SUDO_UID) options.uid = +process.env.SUDO_UID;
-      console.log(options);
       var _run = spawn(phpCmd, argvs, options);
 
       _run.stdout.on('data', function (data) {

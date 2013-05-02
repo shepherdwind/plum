@@ -384,6 +384,9 @@ function _tms_custom ( $args='' ) {
     return _tms_common ( $args , $attributes);
 }
 
+function _tms_autoExtract($args = '') {
+    return _tms_custom($args);
+}
 /**
  * TMS ндубап╠М
  *
