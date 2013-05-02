@@ -89,7 +89,7 @@ stdclass.extend(Hook, stdclass, {
       port    : port || 80,
       method  : request.method,
       headers : headers,
-      path    : file
+      path    : request.url
     });
 
     proxyServer.on('response', function (res) {
