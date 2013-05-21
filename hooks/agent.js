@@ -41,11 +41,14 @@ stdclass.extend(Hook, stdclass, {
     var files = this.get('files');
 
     files.forEach(function(file, i){
-      if (file === false) return this._add();
-      var basePath = this.get('path');
-      var filePath = basePath + file;
-      this._do(file, i, false);
-      return null;
+      if (file === false) {
+        return this._add();
+      } else {
+        var basePath = this.get('path');
+        var filePath = basePath + file;
+        this._do(file, i, false);
+        return null;
+      }
     }, this);
 
   },
@@ -84,6 +87,13 @@ stdclass.extend(Hook, stdclass, {
     }
 
     headers.Host = host;
+
+    if (request.headers.host == host) {
+      log('config error', 'error', 'cusotms.host is equal to host ' + request.headers.host);
+      self.fire('end', {index: i, data: "config error, customs.host should not equat to current host"});
+      return;
+    }
+
     var proxyServer = http.request({
       host    : host,
       port    : port || 80,
