@@ -11,7 +11,7 @@ var PUB_SRV = 'assets.gslb.taobao.com';
 var IP_PUB;
 var USE_PRE = false;
 var IP_PRE = '110.75.14.33';
-var DAILY_IP = '10.232.16.2';
+var DAILY_IP = '10.235.136.37';
 var HOST = 'a.tbcdn.cn';
 var isDaily = false;
 

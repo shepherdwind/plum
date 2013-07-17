@@ -4,10 +4,11 @@
   "keywords"      : ["less", "server", "proxy", "tms"],
   "author"        : "Eward Song<hanwen.sah@taobao.com>",
   "contributors"  : [],
-  "version"       : "0.4.8",
+  "version"       : "0.4.9",
   "bin"           : { "plum": "./bin/plum" },
   "main"          : "./server",
   "engines"       : { "node": ">=0.8.0" },
+  "repository"    : "git://github.com/shepherdwind/plum.git",
   "dependencies"  : {
     "less"       : ">=1.3",
     "velocityjs" : ">=0.3.6",
@@ -24,6 +25,7 @@
     "0.4.5": ["增加combo.properties配置，see #10", "修复url问题"],
     "0.4.6": ["combo.properties配置支持combo和时间戳，see #10", "velocityjs升级到0.3.7"],
     "0.4.7": ["php执行使用为用户权限", "*规则配置为所有后缀未定义的文件"],
-    "0.4.8": ["增加html代理支持"]
+    "0.4.8": ["增加html代理支持"],
+    "0.4.9": ["修改daily代理ip"],
   }
 }
