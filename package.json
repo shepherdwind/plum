@@ -1,31 +1,72 @@
 {
-  "name"          : "plum",
-  "description"   : "Demo server environment by node",
-  "keywords"      : ["less", "server", "proxy", "tms"],
-  "author"        : "Eward Song<hanwen.sah@taobao.com>",
-  "contributors"  : [],
-  "version"       : "0.4.9",
-  "bin"           : { "plum": "./bin/plum" },
-  "main"          : "./server",
-  "engines"       : { "node": ">=0.8.0" },
-  "repository"    : "git://github.com/shepherdwind/plum.git",
-  "dependencies"  : {
-    "less"       : ">=1.3",
-    "velocityjs" : ">=0.3.6",
-    "iconv-lite" : ">=0.2.7",
-    "osenv" : ">=0.0.3"
+  "name": "plum",
+  "description": "Demo server environment by node",
+  "keywords": [
+    "less",
+    "server",
+    "proxy",
+    "tms"
+  ],
+  "author": "Eward Song<hanwen.sah@taobao.com>",
+  "contributors": [],
+  "version": "0.4.9",
+  "bin": {
+    "plum": "./bin/plum"
+  },
+  "main": "./server",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "repository": "git://github.com/shepherdwind/plum.git",
+  "dependencies": {
+    "less": ">=1.3",
+    "velocityjs": ">=0.3.6",
+    "iconv-lite": ">=0.2.7",
+    "osenv": ">=0.0.3",
+    "stylus": "~0.35.1"
   },
   "updates": {
-    "0.4.2": ["增加webx规则", "增加更新说明"],
-    "0.4.2-1": ["增加webx规则", "修复velocity规则路径问题"],
-    "0.4.3": ["webx规则增加?jsonify输出数据结构", "修改文档，增加webx规则使用文档", "velocityjs版本更新"],
-    "0.4.3-1": ["配置文件默认位置修改为$HOME/.plum.json，防止更新导致配置被覆盖的悲剧(对原来不影响)。"],
-    "0.4.3-2": ["防止webx.json配置不完整情况下的报错情况", "log信息分组"],
-    "0.4.4": ["webx规则使用tms规则解析后缀是php的文件", "tms规则增加全局变量$TMS_LOCAL，区分本地环境和线上环境"],
-    "0.4.5": ["增加combo.properties配置，see #10", "修复url问题"],
-    "0.4.6": ["combo.properties配置支持combo和时间戳，see #10", "velocityjs升级到0.3.7"],
-    "0.4.7": ["php执行使用为用户权限", "*规则配置为所有后缀未定义的文件"],
-    "0.4.8": ["增加html代理支持"],
-    "0.4.9": ["修改daily代理ip"]
+    "0.4.2": [
+      "增加webx规则",
+      "增加更新说明"
+    ],
+    "0.4.2-1": [
+      "增加webx规则",
+      "修复velocity规则路径问题"
+    ],
+    "0.4.3": [
+      "webx规则增加?jsonify输出数据结构",
+      "修改文档，增加webx规则使用文档",
+      "velocityjs版本更新"
+    ],
+    "0.4.3-1": [
+      "配置文件默认位置修改为$HOME/.plum.json，防止更新导致配置被覆盖的悲剧(对原来不影响)。"
+    ],
+    "0.4.3-2": [
+      "防止webx.json配置不完整情况下的报错情况",
+      "log信息分组"
+    ],
+    "0.4.4": [
+      "webx规则使用tms规则解析后缀是php的文件",
+      "tms规则增加全局变量$TMS_LOCAL，区分本地环境和线上环境"
+    ],
+    "0.4.5": [
+      "增加combo.properties配置，see #10",
+      "修复url问题"
+    ],
+    "0.4.6": [
+      "combo.properties配置支持combo和时间戳，see #10",
+      "velocityjs升级到0.3.7"
+    ],
+    "0.4.7": [
+      "php执行使用为用户权限",
+      "*规则配置为所有后缀未定义的文件"
+    ],
+    "0.4.8": [
+      "增加html代理支持"
+    ],
+    "0.4.9": [
+      "修改daily代理ip"
+    ]
   }
 }

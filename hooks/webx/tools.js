@@ -40,6 +40,7 @@ module.exports = function(baseDir, maps){
     return {};
   }
 
+
   var tmsTool = {
     importRgn: function(file){
 
@@ -75,9 +76,21 @@ module.exports = function(baseDir, maps){
     }
   };
 
+  var page = {
+    styleSheets: [],
+    addStyle: function(str){
+      page.styleSheets.push({Url: str});
+      return '';
+    }
+  };
+
   return {
     control: control,
-    tmsTool: tmsTool
+    tmsTool: tmsTool,
+    page: page,
+    reset : function(){
+      page.styleSheets = [];
+    }
   }
 
 };

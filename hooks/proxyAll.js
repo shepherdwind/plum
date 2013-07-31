@@ -71,7 +71,7 @@ stdclass.extend(Proxy, stdclass, {
     var host = request.headers.host;
     HOST = host;
     var referer = request.headers.referer;
-    if (host === 'assets.daily.taobao.net') {
+    if (host === 'assets.daily.taobao.net' || host === 'g.assets.daily.taobao.net') {
       this.set('initialized', true, false);
       isDaily = true;
     } else {

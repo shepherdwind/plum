@@ -59,7 +59,10 @@ stdclass.extend(Webx, stdclass, {
     try {
 
       var tools = require(basePath + toolsPath);
-      tools = utils.mixin(tools || {}, defaultTools(basePath, compoment['common-file-maps']));
+      this.tools = defaultTools(basePath, compoment['common-file-maps']);
+
+      for(var i in this.tools)
+        tools[i] = this.tools[i];
 
       this.tools = tools;
 
@@ -137,7 +140,9 @@ stdclass.extend(Webx, stdclass, {
 
       } else {
 
-        context = utils.mixin(context, this.tools);
+        for(var i in this.tools)
+          context[i] = this.tools[i];
+        //context = utils.mixin(context, this.tools);
 
         var macros = this.globalMacros;
         var vmrun = new Velocity.Compile(html, getMacros(macros));
@@ -145,6 +150,7 @@ stdclass.extend(Webx, stdclass, {
 
         var layout = this.layout(vmrun.context);
         str = layout.replace(/\$screen_placeholder/, str);
+        this.tools.reset();
 
       }
 
@@ -174,7 +180,20 @@ stdclass.extend(Webx, stdclass, {
 
     var file      = this.get('file');
     var basePath  = this.get('basePath');
-    var layout    = basePath + '/layout/' + path.dirname(file) + 'default.vm';
+    var dir = path.dirname(file);
+    var layout, getLayout;
+
+    while(!getLayout) {
+
+      var layout = basePath + 'layout' + dir + '/default.vm';
+      getLayout = fs.existsSync(layout);
+
+      if (dir == '/') {
+        getLayout = true;
+      } else {
+        dir = path.join(dir, '../');
+      }
+    }
 
     var vm = Iconv.decode(fs.readFileSync(layout), 'gbk');
     vm = PARSE_GLOBAL_MACROS + vm;
