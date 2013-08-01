@@ -79,7 +79,7 @@ stdclass.extend(Webx, stdclass, {
     var basePath  = this.get('basePath');
 
     var macrosStr = '';
-    if (utils.isArray(macros)) {
+    if (utils.isArray(macros) && macros.length) {
       macros.forEach(function(file){
         macrosStr += Iconv.decode(fs.readFileSync(basePath + file), 'gbk');
       });
@@ -102,6 +102,9 @@ stdclass.extend(Webx, stdclass, {
     var json = file.replace('.js', '.json');
 
     var context = {};
+    var local = this._getLocalJSON();
+
+    utils.mixin(context, local);
 
     if (fs.existsSync(file)) {
       context = require(file);
@@ -113,6 +116,18 @@ stdclass.extend(Webx, stdclass, {
     }
 
     return context;
+  },
+
+  _getLocalJSON: function(){
+
+    var ret = {};
+    var jsonPath = this.get('filePath').replace(/\.vm$/, '.json');
+
+    if (fs.existsSync(jsonPath)) {
+      ret = JSON.parse(Iconv.decode(fs.readFileSync(jsonPath), 'gbk'));
+    }
+
+    return ret;
   },
 
   parse: function(){
@@ -181,12 +196,18 @@ stdclass.extend(Webx, stdclass, {
     var file      = this.get('file');
     var basePath  = this.get('basePath');
     var dir = path.dirname(file);
+    var basename = path.basename(file, '.htm');
     var layout, getLayout;
 
     while(!getLayout) {
 
-      var layout = basePath + 'layout' + dir + '/default.vm';
+      var layout = basePath + 'layout' + dir + '/' + basename + '.vm';
       getLayout = fs.existsSync(layout);
+
+      if (!getLayout) {
+        layout = basePath + 'layout' + dir + '/default.vm';
+        getLayout = fs.existsSync(layout);
+      }
 
       if (dir == '/') {
         getLayout = true;

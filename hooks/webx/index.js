@@ -79,7 +79,7 @@ stdclass.extend(Hook, stdclass, {
       this.fire('set:header', {type: '.json'});
     }
 
-    try {
+    //try {
       var str = (new webx({
         filePath: filePath,
         isParse: isParse,
@@ -88,9 +88,10 @@ stdclass.extend(Hook, stdclass, {
         file : file
       })).parse();
       this.fire('end', {index: i, data: str });
-    } catch(e) {
-      this.fire('end', {index: i, data: '<pre>' + e.toString()});
-    }
+    //} catch(e) {
+      //throw e;
+      //this.fire('end', {index: i, data: '<pre>' + e.toString()});
+    //}
   }
 
 });

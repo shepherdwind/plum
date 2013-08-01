@@ -3,6 +3,7 @@ var fs   = require('fs');
 var Iconv = require('iconv-lite');
 var spawn = require('child_process').spawn;
 var phpCmd = 'php';
+var utils  = require('../../lib/utils');
 var TMS_PATH = path.join(__dirname, '../php/tms/tms.php');
 
 function tmsVM(file){
@@ -68,11 +69,37 @@ module.exports = function(baseDir, maps){
   };
 
   var control = {
+
     setTemplate: function(file){
+
       fullfile = maps[file] ? baseDir + maps[file] : baseDir + 'control/' + file;
+
+      var $sys = this.$sys;
+
+      if ($sys.others.length) {
+
+        //reset
+        this.__temp = {};
+        var ast = utils.mixin($sys.total, {});
+        ast.path = $sys.others;
+        $sys.vm.getReferences(ast);
+
+      }
+
+      var ret;
       if (fs.existsSync(fullfile)) {
-        return this.eval(Iconv.decode(fs.readFileSync(fullfile), 'gbk'));
+        ret = {};
+        ret.$return = this.eval(Iconv.decode(fs.readFileSync(fullfile), 'gbk'), this.__temp);
+        ret.$stop = true;
       } 
+
+      return ret;
+
+    },
+    __temp: {},
+    setParameter: function(key, value){
+      this.__temp[key] = value;
+      return this;
     }
   };
 
