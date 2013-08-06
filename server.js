@@ -20,6 +20,10 @@ var osenv = require('osenv');
 function getConfigFilePath(){
 
   var home = osenv.home();
+  if (osenv.shell() == 'cmd'){
+    home = require('iconv-lite').decode(home, 'gbk')
+  }
+
   var filePath = path.join(home, '.plum.json');
 
   // 如果文件不存在，从其他路径copy过去
