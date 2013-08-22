@@ -24,4 +24,7 @@ Desktop.ini
 .Spotlight-V100
 .Trashes
 node_modules/stylus
+node_modules/osenv
+node_modules/less
+node_modules/iconv-lite
 node_modules/.bin/

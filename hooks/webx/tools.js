@@ -76,7 +76,7 @@ module.exports = function(baseDir, maps){
 
       var $sys = this.$sys;
 
-      if ($sys.others.length) {
+      if ($sys && $sys.others.length) {
 
         //reset
         this.__temp = {};

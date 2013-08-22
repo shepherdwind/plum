@@ -23,7 +23,8 @@
     "velocityjs": ">=0.3.6",
     "iconv-lite": ">=0.2.7",
     "osenv": ">=0.0.3",
-    "stylus": "~0.35.1"
+    "stylus": "~0.35.1",
+    "jear": "~0.1.1"
   },
   "updates": {
     "0.4.2": [

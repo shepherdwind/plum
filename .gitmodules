@@ -1,12 +1,6 @@
 [submodule "node_modules/velocityjs"]
 	path = node_modules/velocityjs
 	url = git://github.com/shepherdwind/velocity.js.git
-[submodule "node_modules/less"]
-	path = node_modules/less
-	url = git://github.com/cloudhead/less.js.git
-[submodule "node_modules/iconv-lite"]
-  path = node_modules/iconv-lite
-  url = git://github.com/ashtuchkin/iconv-lite.git
-[submodule "node_modules/osenv"]
-	path = node_modules/osenv
-	url = git@github.com:isaacs/osenv.git
+[submodule "node_modules/jear"]
+	path = node_modules/jear
+	url = git@github.com:shepherdwind/jear.git

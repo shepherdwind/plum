@@ -44,9 +44,26 @@ stdclass.extend(Hook, stdclass, {
       if (file === false) return this._add();
 
       var basePath = this.get('path');
+
+      var customs = this.get('customs');
       var basename = path.basename(file).replace(/\.html{0,1}$/, '');
+
+      if (customs && customs.prefix) {
+
+        customs.prefix.some(function(p){
+
+          if (p.indexOf(file)) {
+            file = file.slice(p.length);
+            basePath = basePath + p + '/';
+            return true;
+          }
+
+        });
+
+      }
+
       var filePath = basePath + 'screen' + path.dirname(file) + '/' + basename + '.vm';
-      exists(filePath, this._do.bind(this, file, filePath, i));
+      exists(filePath, this._do.bind(this, file, filePath, basePath, i));
       return null;
     }, this);
 
@@ -56,7 +73,7 @@ stdclass.extend(Hook, stdclass, {
     this.set('len', this.get('len') + 1);
   },
 
-  _do: function _do(file, filePath, i, exist){
+  _do: function _do(file, filePath, basePath, i, exist){
 
     if (!exist){
       //拒绝处理
@@ -80,17 +97,17 @@ stdclass.extend(Hook, stdclass, {
     }
 
     //try {
-      var str = (new webx({
-        filePath: filePath,
-        isParse: isParse,
-        isJsonify: isJsonify,
-        basePath: this.get('path'),
-        file : file
-      })).parse();
-      this.fire('end', {index: i, data: str });
+    var str = (new webx({
+      filePath: filePath,
+      isParse: isParse,
+      isJsonify: isJsonify,
+      basePath: basePath,
+      file : file
+    })).parse();
+    this.fire('end', {index: i, data: str });
     //} catch(e) {
-      //throw e;
-      //this.fire('end', {index: i, data: '<pre>' + e.toString()});
+    //throw e;
+    //this.fire('end', {index: i, data: '<pre>' + e.toString()});
     //}
   }
 
