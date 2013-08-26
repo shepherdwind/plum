@@ -20,7 +20,7 @@
   "repository": "git://github.com/shepherdwind/plum.git",
   "dependencies": {
     "less": ">=1.3",
-    "velocityjs": ">=0.3.16",
+    "velocityjs": ">=0.4.0",
     "iconv-lite": ">=0.2.7",
     "osenv": ">=0.0.3",
     "stylus": "~0.35.1",
