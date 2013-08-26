@@ -9,7 +9,7 @@
   ],
   "author": "Eward Song<hanwen.sah@taobao.com>",
   "contributors": [],
-  "version": "0.5.0",
+  "version": "0.5.1",
   "bin": {
     "plum": "./bin/plum"
   },
@@ -72,6 +72,11 @@
     "0.5.0": [
       "增加stylus规则",
       "webx规则改进"
+    ],
+    "0.5.1": [
+      "velocity.js增加数据模拟功能",
+      "模拟webx，增加$rundata.parameters support",
+      "使用url参数$status来区分一个页面不同状态的模拟数据"
     ]
   }
 }

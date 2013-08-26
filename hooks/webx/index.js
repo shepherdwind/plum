@@ -102,7 +102,8 @@ stdclass.extend(Hook, stdclass, {
       isParse: isParse,
       isJsonify: isJsonify,
       basePath: basePath,
-      file : file
+      file : file,
+      rundata: { parameters: url.query }
     })).parse();
     this.fire('end', {index: i, data: str });
     //} catch(e) {

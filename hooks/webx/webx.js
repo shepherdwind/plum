@@ -28,6 +28,7 @@ stdclass.extend(Webx, stdclass, {
     isParse: false,
     file: '',
     basePath: '',
+    rundata: {},
     compoment: {}
   },
 
@@ -98,12 +99,19 @@ stdclass.extend(Webx, stdclass, {
     var compoment = this.get('compoment');
     var jsonDataDir = basePath + compoment['json-data-dir'];
 
+    //把url.query赋值给rundata
+    var context = { rundata: this.get('rundata') };
+
+    //根据status状态，区分同一个页面的不同状态，分别获取模拟数据
+    var status = context.rundata.parameters['$status'];
+
+    status = status ? '_' + status : ''
+
     file = jsonDataDir + '/' + file;
-    var json = file.replace('.js', '.json');
+    var json = file.replace('.js', status + '.json');
+    console.log(json)
 
-    var context = {};
     var local = this._getLocalJSON();
-
     utils.mixin(context, local);
 
     if (fs.existsSync(file)) {
@@ -118,7 +126,7 @@ stdclass.extend(Webx, stdclass, {
     return context;
   },
 
-  _getLocalJSON: function(){
+  _getLocalJSON: function(status){
 
     var ret = {};
     var jsonPath = this.get('filePath').replace(/\.vm$/, '.json');
