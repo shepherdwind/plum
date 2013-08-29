@@ -72,9 +72,14 @@ module.exports = function(baseDir, maps){
 
     setTemplate: function(file){
 
-      fullfile = maps[file] ? baseDir + maps[file] : baseDir + 'control/' + file;
+      var fullfile = maps[file] ? baseDir + maps[file] : baseDir + 'control/' + file;
 
       var $sys = this.$sys;
+      var extname = path.extname(fullfile)
+
+      if (!extname) {
+        fullfile += '.vm'
+      }
 
       if ($sys && $sys.others.length) {
 
@@ -89,7 +94,7 @@ module.exports = function(baseDir, maps){
       var ret;
       if (fs.existsSync(fullfile)) {
         ret = {};
-        ret.$return = this.eval(Iconv.decode(fs.readFileSync(fullfile), 'gbk'), this.__temp);
+        ret.$return = this.eval(Iconv.decode(fs.readFileSync(fullfile), 'gbk'), this.__temp, file);
         ret.$stop = true;
       } 
 
@@ -115,6 +120,11 @@ module.exports = function(baseDir, maps){
     control: control,
     tmsTool: tmsTool,
     page: page,
+    stringEscapeUtil: {
+      unescapeJava: function(str){
+        return str
+      }
+    },
     reset : function(){
       page.styleSheets = [];
     }

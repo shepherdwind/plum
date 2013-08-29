@@ -7,11 +7,23 @@ var stdclass = require('../../lib/stdclass');
 var utils    = require('../../lib/utils');
 var PARSE_GLOBAL_MACROS = '#parse_global_macros() ';
 
-var getMacros = function(macros){
+var getMacros = function(macros, basePath){
 
   return {
     parse_global_macros: function(){
       return this.eval(macros);
+    },
+    parse: function(file){
+
+      var fullPath = path.join(basePath, file)
+
+      if (fs.existsSync(fullPath)) {
+        var ret = fs.readFileSync(fullPath)
+        ret = Iconv.decode(ret, 'gbk')
+        return this.eval(ret)
+      } 
+
+      return ''
     }
   };
 
@@ -101,6 +113,9 @@ stdclass.extend(Webx, stdclass, {
 
     //把url.query赋值给rundata
     var context = { rundata: this.get('rundata') };
+    context.rundata.parameters.containsKey = function(key){
+      return key in this
+    }
 
     //根据status状态，区分同一个页面的不同状态，分别获取模拟数据
     var status = context.rundata.parameters['$status'];
@@ -109,7 +124,6 @@ stdclass.extend(Webx, stdclass, {
 
     file = jsonDataDir + '/' + file;
     var json = file.replace('.js', status + '.json');
-    console.log(json)
 
     var local = this._getLocalJSON();
     utils.mixin(context, local);
@@ -168,9 +182,9 @@ stdclass.extend(Webx, stdclass, {
         //context = utils.mixin(context, this.tools);
 
         var macros = this.globalMacros;
-        var vmrun = new Velocity.Compile(html, getMacros(macros));
-        vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken'])
-        str = vmrun.render(context);
+        var vmrun = new Velocity.Compile(html);
+        vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken', 'stringEscapeUtil'])
+        str = vmrun.render(context, getMacros(macros, this.get('basePath')));
 
         var layout = this.layout(vmrun.context);
         str = layout.replace(/\$screen_placeholder/, str);
@@ -238,9 +252,9 @@ stdclass.extend(Webx, stdclass, {
     var macros = this.globalMacros;
     var html = Velocity.Parser.parse(vm);
 
-    var vmrun = new Velocity.Compile(html, getMacros(macros));
-    vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken'])
-    var str = vmrun.render(context);
+    var vmrun = new Velocity.Compile(html);
+    vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken', 'stringEscapeUtil'])
+    var str = vmrun.render(context, getMacros(macros, this.get('basePath')));
     return str;
 
   }
