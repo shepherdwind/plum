@@ -183,7 +183,7 @@ stdclass.extend(Webx, stdclass, {
 
         var macros = this.globalMacros;
         var vmrun = new Velocity.Compile(html);
-        vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken', 'stringEscapeUtil'])
+        vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken', 'stringEscapeUtil', 'enhanceToken'])
         str = vmrun.render(context, getMacros(macros, this.get('basePath')));
 
         var layout = this.layout(vmrun.context);
@@ -253,7 +253,7 @@ stdclass.extend(Webx, stdclass, {
     var html = Velocity.Parser.parse(vm);
 
     var vmrun = new Velocity.Compile(html);
-    vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken', 'stringEscapeUtil'])
+    vmrun.addIgnoreEscpape(['control', 'securityUtil', 'tbToken', 'stringEscapeUtil', 'enhanceToken'])
     var str = vmrun.render(context, getMacros(macros, this.get('basePath')));
     return str;
 

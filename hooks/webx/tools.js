@@ -74,32 +74,21 @@ module.exports = function(baseDir, maps){
 
       var fullfile = maps[file] ? baseDir + maps[file] : baseDir + 'control/' + file;
 
-      var $sys = this.$sys;
       var extname = path.extname(fullfile)
 
       if (!extname) {
         fullfile += '.vm'
       }
 
-      if ($sys && $sys.others.length) {
-
-        //reset
-        this.__temp = {};
-        var ast = utils.mixin($sys.total, {});
-        ast.path = $sys.others;
-        $sys.vm.getReferences(ast);
-
-      }
-
-      var ret;
       if (fs.existsSync(fullfile)) {
-        ret = {};
-        ret.$return = this.eval(Iconv.decode(fs.readFileSync(fullfile), 'gbk'), this.__temp, file);
-        ret.$stop = true;
+        this.fullfile = fullfile;
       } 
 
-      return ret;
+      return this;
 
+    },
+    toString: function(){
+      return this.eval(Iconv.decode(fs.readFileSync(this.fullfile), 'gbk'), this.__temp);
     },
     __temp: {},
     setParameter: function(key, value){
