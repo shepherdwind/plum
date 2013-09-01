@@ -78,6 +78,7 @@
       "模拟webx，增加$rundata.parameters support",
       "使用url参数$status来区分一个页面不同状态的模拟数据"
     ],
-    "0.5.2": [ "velocityjs默认支持html转义", "webx规则增加parse支持", "parse支持省略文件后缀，默认找.vm文件" ]
+    "0.5.2": [ "velocityjs默认支持html转义", "webx规则增加parse支持", "parse支持省略文件后缀，默认找.vm文件",
+      "control.setTemplate使用toString函数来模拟，更接近java方式" ]
   }
 }
