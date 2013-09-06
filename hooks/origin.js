@@ -35,15 +35,15 @@ stdclass.extend(Origin, stdclass, {
     //记录总执行时间
     time: [],
     hooks: [],
-    customs: {}
+    customs: {},
+    request: {}
   },
 
   CONSIT: {
     MIME: {},
     //服务器超时10s
     TIME_OUT: 30000,
-    bin: {},
-    request: {}
+    bin: {}
   },
 
   /**

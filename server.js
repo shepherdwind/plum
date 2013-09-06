@@ -73,6 +73,10 @@ function init(version){
 function Server(request, response, cfg){
   this.request = request;
   this.response = response;
+  if (request.url.indexOf('theme-min.css') > -1) {
+    console.log([request.headers.host, request.url])
+    debugger
+  }
   this.finished = false;
   this.init(cfg);
 }
@@ -177,6 +181,7 @@ Server.prototype = {
 
     var maps = this._getMaps(serverConfig, files, ext);
     var mapPath = maps.mapPath;
+    maps.hooks = clearHook(maps.hooks)
     var hooks = maps.hooks;
     var hooks2Files = maps._files;
 
@@ -580,6 +585,19 @@ function getComboProp(config, url){
   }
 
   return url
+}
+
+function clearHook(hooks){
+  var tmp = []
+  var keys = {}
+  hooks.forEach(function(hook){
+    if (!keys[hook]) {
+      keys[hook] = true
+      tmp.push(hook)
+    }
+  })
+
+  return tmp;
 }
 
 module.exports = init;
