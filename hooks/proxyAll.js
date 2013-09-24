@@ -7,6 +7,12 @@ var fs       = require('fs');
 var url      = require('url');
 var exists = fs.exists || path.exists;
 
+var ips = {
+  'g.tbcdn.cn': '115.238.23.250',
+  'assets.daily.taobao.net': '10.235.136.37',
+  'g.assets.daily.taobao.net': '10.235.136.37'
+};
+var ignoreList = ['global-min.js'];
 var PUB_SRV = 'assets.gslb.taobao.com';
 var IP_PUB;
 var USE_PRE = false;
@@ -71,7 +77,7 @@ stdclass.extend(Proxy, stdclass, {
     var host = request.headers.host;
     HOST = host;
     var referer = request.headers.referer;
-    if (host === 'assets.daily.taobao.net' || host === 'g.assets.daily.taobao.net') {
+    if (host in ips && ips.hasOwnProperty(host)) {
       this.set('initialized', true, false);
       isDaily = true;
     } else {
@@ -121,14 +127,28 @@ stdclass.extend(Proxy, stdclass, {
     var self = this;
     var ret = [];
     var time = Date.now();
+    var customs = this.get('customs') || {};
+    var isDebug = customs.debug;
+
+    if (isDebug) {
+
+      var isIgnore = ignoreList.some(function(ignore){
+        return file.indexOf(ignore) > -1;
+      })
+
+      if (isIgnore) isDebug = false;
+
+    }
+
+    var filePath = isDebug ? file.replace('-min', '') : file;
 
     http.get({
       headers: {
         host: HOST
       },
-      host: isDaily ? DAILY_IP : ip,
+      host: isDaily ? ips[HOST]: ip,
       port: 80,
-      path: file
+      path: filePath
     }, function (res) {
 
       res.on('data', function(data){

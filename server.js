@@ -73,10 +73,6 @@ function init(version){
 function Server(request, response, cfg){
   this.request = request;
   this.response = response;
-  if (request.url.indexOf('theme-min.css') > -1) {
-    console.log([request.headers.host, request.url])
-    debugger
-  }
   this.finished = false;
   this.init(cfg);
 }
