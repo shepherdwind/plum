@@ -11,5 +11,8 @@
   ".php"  : "text/html",
   ".htm"  : "text/html",
   "*"     : "text/html",
-  ".txt"  : "text/plain"
+  ".txt"  : "text/plain",
+  ".ttf"  : "application/octet-stream",
+  ".woff"  : "application/octet-stream",
+  ".svg"  : "application/octet-stream"
 }
