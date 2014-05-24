@@ -10,53 +10,6 @@ function LessHook(){
   this.init.apply(this, arguments);
 }
 
-(function (){
-  var _importer = less.Parser.importer;
-  var isUrlRe = /^(?:https?:)?\/\//i;
-  less.Parser.importer = function (file, paths, callback, env) {
-    var isUrl = isUrlRe.test( file );
-    if (isUrl || isUrlRe.test(paths[0])) {
-
-      var url = require('url'),
-          http = require('http'),
-
-      urlStr = isUrl ? file : url.resolve(paths[0], file),
-      urlObj = url.parse(urlStr),
-      req = {
-        host:   urlObj.hostname,
-        port:   urlObj.port || 80,
-        path:   urlObj.pathname + (urlObj.search||'')
-      };
-
-      http.get(req, function (res) {
-        var body = '';
-        res.on('data', function (chunk) {
-          body += chunk.toString();
-        });
-        res.on('end', function () {
-          if (!body) {
-            sys.error( 'Empty body (HTTP '+ res.statusCode + ') returned by "' + urlStr +'"' );
-          }
-          new(less.Parser)({
-            paths:    [urlObj.protocol +'//'+ urlObj.host + urlObj.pathname.replace(/[^\/]*$/, '')],
-            filename: urlStr
-          }).parse(body, function (e, root) {
-            callback(e, root, body);
-          });
-        });
-      }).on('error', function (err) {
-        sys.error("resource '" + file + "' wasn't found.");
-        sys.error( err +'\n' );
-        process.exit(1);
-      });
-
-    } else {
-      _importer.apply(this, arguments);
-    }
-
-  };
-})();
-
 stdclass.extend(LessHook, stdclass, {
 
   attributes: {

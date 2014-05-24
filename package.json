@@ -9,7 +9,7 @@
   ],
   "author": "Eward Song<hanwen.sah@taobao.com>",
   "contributors": [],
-  "version": "0.5.2",
+  "version": "0.5.3",
   "bin": {
     "plum": "./bin/plum"
   },

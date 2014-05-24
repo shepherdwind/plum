@@ -6,7 +6,7 @@ var http = require('https');
 
 function getVersion(cb){
   http.get({
-    host: 'raw.github.com',
+    host: 'raw.githubusercontent.com',
     method: 'GET',
     port: 443,
     path: '/shepherdwind/plum/master/package.json'
@@ -16,7 +16,7 @@ function getVersion(cb){
       rets += data.toString();
     });
     ret.on('end', function(){
-      cb(JSON.parse(rets));
+      cb(JSON.parse(rets || '{}'));
     });
   }).on('error', function(e){
     console.log(e);
