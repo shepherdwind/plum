@@ -17,6 +17,8 @@ var MIME;
 var ALL_FILES   = '*';
 var osenv = require('osenv');
 
+global.serverTime = Date.now();
+
 function getConfigFilePath(){
 
   var home = osenv.home();
@@ -55,6 +57,7 @@ function init(version){
     config = cjson.parse(json);
     config.port = config.proxy || 80;
     MIME = JSON.parse(fs.readFileSync(__dirname + '/mime.json'));
+
     http.createServer(function createServer(req, res){
 
       if (req.url === '/config') {
@@ -67,6 +70,7 @@ function init(version){
         new Server(req, res);
       }
     }).listen(config.port);
+
   });
 }
 
@@ -150,6 +154,7 @@ Server.prototype = {
     }
     //var hosts = config.servers;
 
+    global.serverTime = Date.now();
     if (!serverConfig){
       log('error', 'error', host + ' is not defined in the config.json');
       this.error({

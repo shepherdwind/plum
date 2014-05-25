@@ -102,6 +102,7 @@ stdclass.extend(Hook, stdclass, {
       path    : request.url
     });
 
+    var time = Date.now();
     proxyServer.on('response', function (res) {
       var _headers = {};
       for(var x in res.headers){
@@ -111,6 +112,7 @@ stdclass.extend(Hook, stdclass, {
       self.fire('set:header', {headers: _headers, code: res['statusCode']});
 
       res.on('data', function(data){
+        console.log('get buffer %s: %sms, len: %s', request.url, Date.now() - time, data.length);
         self.fire('data', {data: data, index: i});
       });
 

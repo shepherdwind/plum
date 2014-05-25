@@ -142,6 +142,8 @@ stdclass.extend(Proxy, stdclass, {
 
     var filePath = isDebug ? file.replace('-min', '') : file;
 
+    console.log('proxy start %s: %sms', filePath, Date.now() - serverTime);
+
     http.get({
       headers: {
         host: HOST
@@ -152,6 +154,7 @@ stdclass.extend(Proxy, stdclass, {
     }, function (res) {
 
       res.on('data', function(data){
+        console.log('get buffer %s: %sms, len: %s', filePath, Date.now() - time, data.length);
         self.fire('data', {data: data, index: i});
       });
 
